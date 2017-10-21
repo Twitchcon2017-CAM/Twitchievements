@@ -1,0 +1,38 @@
+@import "~styles.scss";
+
+.streamer {
+
+  @include element('title') {
+    font-size: 48px;
+    margin-top: 10px;
+  }
+
+  @include element('twitchievement') {
+
+    @include element('title') {
+      font-size: 24px;
+      margin-bottom: 5px;
+    }
+
+    @include element('description') {
+      color: $sub-standard;
+      margin-bottom: 5px;
+      margin-top: 5px;
+    }
+
+    @include element('list') {
+
+      margin-left: 30px;
+
+      @include element('item') {
+        margin-top: 5px;
+        margin-bottom: 5px;
+
+        @include modifier('first') {
+          font-size: 24px;
+          color: $navbar;
+        }
+      }
+    }
+  }
+}

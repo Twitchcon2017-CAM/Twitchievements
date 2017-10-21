@@ -1,3 +1,23 @@
-<p>
-  streamer works!
-</p>
+<section class="streamer">
+  <h1 class="streamer__title center-text">
+    <a href="https://twitch.tv/{{streamerId}}" target="_blank">{{streamerId}}</a>
+  </h1>
+
+  <div class="streamer__twitchievement"
+    *ngFor="let twitchievement of twitchievementsKeys">
+    <h1 class="streamer__twitchievement__title center-text">
+      {{twitchievements[twitchievement].displayName}}
+    </h1>
+    <h3 class="streamer__twitchievement__description center-text">
+      {{twitchievements[twitchievement].description}}
+    </h3>
+    <ol class="streamer__twitchievement__list"
+    type="1">
+      <li *ngFor="let user of twitchievements[twitchievement].users; let i = index"
+      [ngClass]="{'streamer__twitchievement__list__item--first': i === 0}"
+      class="streamer__twitchievement__list__item">
+        {{user.username}}: {{user.value}}
+      </li>
+    </ol>
+  </div>
+</section>

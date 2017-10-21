@@ -1,3 +1,23 @@
-<h1>
-  Dashboard
-</h1>
+<section class="dashboard">
+  <h1 class="dashboard__title center-text">
+    Dashboard
+  </h1>
+
+  <div class="dashboard__twitchievement"
+    *ngFor="let twitchievement of twitchievementsKeys">
+    <h1 class="dashboard__twitchievement__title center-text">
+      {{twitchievements[twitchievement].displayName}}
+    </h1>
+    <h3 class="dashboard__twitchievement__description center-text">
+      {{twitchievements[twitchievement].description}}
+    </h3>
+    <ol class="dashboard__twitchievement__list"
+    type="1">
+      <li *ngFor="let user of twitchievements[twitchievement].users; let i = index"
+        [ngClass]="{'dashboard__twitchievement__list__item--first': i === 0}"
+        class="dashboard__twitchievement__list__item">
+        {{user.username}}: {{user.value}}
+      </li>
+    </ol>
+  </div>
+</section>

@@ -21,10 +21,26 @@ fastify.register(require('fastify-jwt'), { secret: tokenSecret }, err => {
 
 // Define Our categories
 const twitchievementCategories = [
-  'msg_count',
-  'word_count',
-  'caps_count',
-  'emoji_count'
+  {
+    twitchievement: 'msg_count',
+    displayName: 'Chattiest',
+    description: ''
+  },
+  {
+    twitchievement: 'word_count',
+    displayName: 'Wordiest',
+    description: ''
+  },
+  {
+    twitchievement: 'caps_count',
+    displayName: 'LOUDEST',
+    description: ''
+  },
+  {
+    twitchievement: 'emoji_count',
+    displayName: 'Emojiest',
+    description: ''
+  }
 ];
 
 // Initialize mongo, fs for testing
@@ -140,8 +156,13 @@ function getStatsForUser(username, reply) {
       const chatTwitchievements = {};
 
       // Find Top 5 of each key
-      twitchievementCategories.forEach(twitchievement => {
-        chatTwitchievements[twitchievement] = [];
+      twitchievementCategories.forEach(twitchievementObject => {
+        const twitchievement = twitchievementObject.twitchievement;
+        chatTwitchievements[twitchievement] = {
+          displayName: twitchievementObject.displayName,
+          descritpion: twitchievementObject.description,
+          users: []
+        };
 
         // Iterate through all of the streamers users and sort by the category
         // Getting the keys of all the users, and then comparing them to the specified category on the user
@@ -161,7 +182,7 @@ function getStatsForUser(username, reply) {
 
         // Pop the top 10 onto the twitchievement, and populate the user value for the twitchievement
         userKeys.slice(0, 10).forEach((userKey) => {
-          chatTwitchievements[twitchievement].push({
+          chatTwitchievements[twitchievement].users.push({
             username: userKey,
             value: streamer.users[userKey][twitchievement]
           });
