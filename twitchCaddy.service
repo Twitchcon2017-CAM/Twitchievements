@@ -9,7 +9,7 @@ After=network.target
 Type=simple
 User=torch2424
 WorkingDirectory=/home/torch2424
-ExecStart=/bin/bash --login -c 'source /home/${whoami}/.bashrc; cd ~/Twitchievements && caddy -email aaron@aaronthedev.com'
+ExecStart=/bin/bash --login -c 'source /home/${whoami}/.bashrc; cd ~/Twitchievements && caddy -email aaron@aaronthedev.com && cd backend/twitchievements-fastify && forever index.js'
 Restart=always
 
 [Install]
