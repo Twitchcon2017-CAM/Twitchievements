@@ -23,24 +23,30 @@ fastify.register(require('fastify-jwt'), { secret: tokenSecret }, err => {
 const twitchievementCategories = [
   {
     twitchievement: 'msg_count',
-    displayName: 'Chattiest',
-    description: ''
+    displayName: 'Talkative',
+    description: 'These users always have something to say. Measured by how many individual messages a user sends'
   },
   {
     twitchievement: 'word_count',
-    displayName: 'Wordiest',
-    description: ''
+    displayName: 'Chattiest',
+    description: 'Short isn\'t always sweet. Counts the number of words in each message sent by a user.'
   },
   {
     twitchievement: 'caps_count',
     displayName: 'LOUDEST',
-    description: ''
+    description: 'EVERYONE CAN HEAR YOU IF YOU YELL IN ALL CAPS! Measures how many words a user yells.'
   },
   {
-    twitchievement: 'emoji_count',
-    displayName: 'Emojiest',
-    description: ''
-  }
+    twitchievement: 'wordDictionary',
+    displayName: 'Most Frequent Word',
+    description: 'A trending word appears! Measures the most frequent word amongst the communitty.',
+    valueBased: true
+  },
+  // {
+  //   twitchievement: 'emoji_count',
+  //   displayName: 'Emojiest',
+  //   description: ''
+  // }
 ];
 
 // Initialize mongo, fs for testing
@@ -94,7 +100,10 @@ fastify.register(require('fastify-mongodb'), {
               }
             });
           }
-          collection.updateOne({ email: item.email }, {$set: { users }});
+          collection.updateOne({ email: item.email }, {$set: {
+            users,
+            wordDictionary: parseResult.wordDictionary
+          }});
         });
       });
 
@@ -160,33 +169,58 @@ function getStatsForUser(username, reply) {
         const twitchievement = twitchievementObject.twitchievement;
         chatTwitchievements[twitchievement] = {
           displayName: twitchievementObject.displayName,
-          descritpion: twitchievementObject.description,
-          users: []
+          description: twitchievementObject.description,
         };
 
-        // Iterate through all of the streamers users and sort by the category
-        // Getting the keys of all the users, and then comparing them to the specified category on the user
-        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
-        const userKeys = Object.keys(streamer.users);
-        userKeys.sort((a, b) => {
-          if(!streamer.users[b][twitchievement] ||
-            streamer.users[b][twitchievement] < streamer.users[a][twitchievement]) {
-            return -1;
-          }
-          if(streamer.users[b][twitchievement] > streamer.users[a][twitchievement]) {
-            return 1;
-          }
+        // Handle Value Based twitchievements
+        if(twitchievementObject.valueBased) {
+          chatTwitchievements[twitchievement].values = [];
 
-          return 0;
-        });
-
-        // Pop the top 10 onto the twitchievement, and populate the user value for the twitchievement
-        userKeys.slice(0, 10).forEach((userKey) => {
-          chatTwitchievements[twitchievement].users.push({
-            username: userKey,
-            value: streamer.users[userKey][twitchievement]
+          // Find and sort the object on the streamer
+          const valueKeys = Object.keys(streamer[twitchievement]);
+          valueKeys.sort((a, b) => {
+            if(streamer[twitchievement][a] > streamer[twitchievement][b]) {
+              return -1;
+            }
+            if(streamer[twitchievement][a] < streamer[twitchievement][b]) {
+              return 1;
+            }
+            return 0;
           });
-        })
+
+          valueKeys.slice(0, 10).forEach(valueKey => {
+            chatTwitchievements[twitchievement].values.push({
+              key: valueKey,
+              amount: streamer[twitchievement][valueKey]
+            });
+          });
+        } else {
+          // Handle User based Twitcheivements
+          chatTwitchievements[twitchievement].users = [];
+          // Iterate through all of the streamers users and sort by the category
+          // Getting the keys of all the users, and then comparing them to the specified category on the user
+          // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+          const userKeys = Object.keys(streamer.users);
+          userKeys.sort((a, b) => {
+            if(!streamer.users[b][twitchievement] ||
+              streamer.users[b][twitchievement] < streamer.users[a][twitchievement]) {
+              return -1;
+            }
+            if(streamer.users[b][twitchievement] > streamer.users[a][twitchievement]) {
+              return 1;
+            }
+
+            return 0;
+          });
+
+          // Pop the top 10 onto the twitchievement, and populate the user value for the twitchievement
+          userKeys.slice(0, 10).forEach((userKey) => {
+            chatTwitchievements[twitchievement].users.push({
+              username: userKey,
+              value: streamer.users[userKey][twitchievement]
+            });
+          })
+        }
       });
 
       // Finally respond with our twitchievement
@@ -240,7 +274,8 @@ fastify.post('/api/join', (request, reply) => {
           email: request.body.email,
           securePassword: hash,
           twitchUsername: request.body.twitchUsername,
-          users: {}
+          users: {},
+          wordDictionary: {}
         }, (insertErr, result) => {
           if (insertErr) {
             reply
@@ -379,8 +414,6 @@ fastify.get('/api/stats', (request, reply) => {
       .code(401);
       return;
     }
-
-    console.log(tokenDecoded);
 
     // Get the stats for the user
     getStatsForUser(tokenDecoded.twitchUsername, reply);

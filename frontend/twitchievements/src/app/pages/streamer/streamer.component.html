@@ -18,6 +18,12 @@
       class="streamer__twitchievement__list__item">
         {{user.username}}: {{user.value}}
       </li>
+
+      <li *ngFor="let value of twitchievements[twitchievement].values; let i = index"
+      [ngClass]="{'streamer__twitchievement__list__item--first': i === 0}"
+      class="streamer__twitchievement__list__item">
+        {{value.key}}: {{value.amount}}
+      </li>
     </ol>
   </div>
 </section>

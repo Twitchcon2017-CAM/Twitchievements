@@ -6,7 +6,7 @@ class twitch_chat_reader {
         this.msg_count = 0;
         this.client = new tmi.client({
             options: {
-                debug: true
+                debug: false
             },
             connection: {
                 cluster: "aws",
@@ -18,60 +18,60 @@ class twitch_chat_reader {
             },
             channels: [channel]
         });
+        this.wordDictionary = {};
+    }
+
+    getEmojiDictionary() {
+        //TODO: dictionary of emojis
+        return { "happyface": 0 };
+    }
+
+    parse(user, msg) {
+        msg_count++;
+        var msg_arr = msg.split(" "); // split the message into array of string by whitespace
+        var word_count = msg_arr.length; // get the count, this will be summed to the user's chattiness
+        var caps_count = 0; //count of the number of CAPITALIZED words in the message, summed for user
+        var emoji_count = 0; //count the number of emojis used, summed for user
+        for (var i = 0; i < word_count; i++) {
+            var word = msg_arr[i];
+
+            // Add the word to our word dicitonary
+            // Be sure to remove dots to avoid dot notation in bracket notation
+            const wordNoDots = word.replace(/\./g, '')
+            if(this.wordDictionary[wordNoDots]) {
+              this.wordDictionary[wordNoDots]++;
+            } else {
+              this.wordDictionary[wordNoDots] = 1;
+            }
+
+            // Start our emjoi dictionary
+            var emojiDict = this.getEmojiDictionary();
+            if (emojiDict[word] != undefined) {
+                emoji_count++;
+            }
+            if (word === word.toUpperCase()) {
+                //console.log(word+" "+word.toUpperCase());
+                caps_count++;
+            }
+        }
+        const response = {
+          msg_count,
+          word_count,
+          caps_count,
+          wordDictionary: this.wordDictionary,
+          //emoji_count - No Emoji Count until we get this working
+        }
+        return response;
     }
 
     run(chatCallback) {
         this.client.connect();
 
-        this.client.on('chat', function(channel, user, message, self) {
+        this.client.on('chat', (channel, user, message) => {
             var user_string = user["username"];
-            var message_return = user_string + " " + message + "\n";
-            chatCallback(user_string, message_return, parse(user_string, message_return));
+            var message_return = user_string + " " + message;
+            chatCallback(user_string, message_return, this.parse(user_string, message_return));
         });
-
-        function getWordDictionary() {
-            //TODO: get the dictionary of word usage which should be contained in the stream log level of the JSON
-            return { "twitch": 0, "bloody": 0, "co": 0 };
-        }
-
-        function getEmojiDictionary() {
-            //TODO: dictionary of emojis
-            return { "happyface": 0 };
-        }
-
-        function parse(user, msg) {
-            msg_count++;
-            var msg_arr = msg.split(" "); //split the message into array of string by whitespace
-            var word_count = msg_arr.length; //get the count, this will be summed to the user's chattiness
-            var caps_count = 0; //count of the number of CAPITALIZED words in the message, summed for user
-            var emoji_count = 0; //count the number of emojis used, summed for user
-            for (var i = 0; i < word_count; i++) {
-                var word = msg_arr[i];
-                //for(word in msg_arr){
-                var dict = getWordDictionary(); //access word frequency dict for this session or streamer? unclear at this point
-                var emojiDict = getEmojiDictionary();
-                if (emojiDict[word] != undefined) {
-                    emoji_count++;
-                }
-                if (dict[word] != undefined) {
-                    //console.log(word);
-                    dict[word]++;
-                } else {
-                    dict[word] = 1;
-                }
-                if (word === word.toUpperCase()) {
-                    //console.log(word+" "+word.toUpperCase());
-                    caps_count++;
-                }
-            }
-            const response = {
-              msg_count,
-              word_count,
-              caps_count,
-              emoji_count
-            }
-            return response;
-        }
     }
 };
 

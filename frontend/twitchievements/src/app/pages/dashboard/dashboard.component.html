@@ -13,10 +13,18 @@
     </h3>
     <ol class="dashboard__twitchievement__list"
     type="1">
+      <!-- Users -->
       <li *ngFor="let user of twitchievements[twitchievement].users; let i = index"
         [ngClass]="{'dashboard__twitchievement__list__item--first': i === 0}"
         class="dashboard__twitchievement__list__item">
         {{user.username}}: {{user.value}}
+      </li>
+
+      <!-- Values -->
+      <li *ngFor="let value of twitchievements[twitchievement].values; let i = index"
+        [ngClass]="{'dashboard__twitchievement__list__item--first': i === 0}"
+        class="dashboard__twitchievement__list__item">
+        {{value.key}}: {{value.amount}}
       </li>
     </ol>
   </div>
