@@ -27,6 +27,7 @@
     "sass-loading-spinner": "^1.0.4",
     "sass-media-queries": "^1.0.3",
     "sass-theme-defaults": "^1.0.2",
+    "twitch-emoticons": "^2.1.0",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {

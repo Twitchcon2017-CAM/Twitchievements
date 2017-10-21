@@ -13,6 +13,7 @@ export class DashboardComponent implements OnInit {
   userTwitchievements: any
   userTwitchievementsKeys: any
   username: any
+  emoteFetch: any
   error: any
 
   constructor(private apiService: ApiService) {

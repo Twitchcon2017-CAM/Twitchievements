@@ -1,4 +1,4 @@
-<section class="dashboard">
+<section class="dashboard animated fadeIn">
   <h1 class="dashboard__title center-text">
     Dashboard: {{username}}
   </h1>
@@ -53,6 +53,7 @@
       <!-- Values -->
       <li *ngFor="let value of twitchievements[twitchievement].values; let i = index"
         [ngClass]="{'dashboard__twitchievement__list__item--first': i === 0}"
+        [style.color]="twitchievement === 'colorDictionary' ? value.key : ''"
         class="dashboard__twitchievement__list__item">
         {{value.key}}: {{value.amount}}
       </li>

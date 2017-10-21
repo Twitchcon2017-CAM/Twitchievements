@@ -21,7 +21,7 @@ class twitch_chat_reader {
         });
         this.wordDictionary = {};
         this.emojiDictionary = {};
-        this.colorDictionary = {};3
+        this.colorDictionary = {};
     }
 
     getEmojiDictionary() {
@@ -34,7 +34,7 @@ class twitch_chat_reader {
         var word_count = msg_arr.length; // get the count, this will be summed to the user's chattiness
         var caps_count = 0; //count of the number of CAPITALIZED words in the message, summed for user
         var emoji_count = 0; //count the number of emojis used, summed for user
-        var color_count = 0; //counts user's most common color 
+        var color_count = 0; //counts user's most common color
 
         for (var i = 0; i < word_count; i++) {
             var word = msg_arr[i].trim();
@@ -51,10 +51,12 @@ class twitch_chat_reader {
             }
 
             //Adding in colors into the dict
-            if(this.colorDictionary[color]){
-                this.colorDictionary[color]++;
-            } else {
-                this.colorDictionary[color] = 1;
+            if (color) {
+              if(this.colorDictionary[color]){
+                  this.colorDictionary[color]++;
+              } else {
+                  this.colorDictionary[color] = 1;
+              }
             }
 
             // Start our emjoi dictionary
@@ -62,12 +64,11 @@ class twitch_chat_reader {
             // Check if it is an emoji
             if(emojiDict[word]) {
               if (this.emojiDictionary[word] != undefined) {
-                  emoji_count++;
                   this.emojiDictionary[word]++;
               } else {
-                emoji_count++;
                 this.emojiDictionary[word] = 1;
               }
+              emoji_count++;
             }
             if (word === word.toUpperCase()) {
                 //console.log(word+" "+word.toUpperCase());
@@ -78,9 +79,9 @@ class twitch_chat_reader {
           msg_count,
           word_count,
           caps_count,
+          emoji_count,
           wordDictionary: this.wordDictionary,
           emojiDictionary: this.emojiDictionary,
-          //emoji_count - No Emoji Count until we get this working
           colorDictionary: this.colorDictionary
         }
         return response;

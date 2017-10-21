@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {ActivatedRoute} from '@angular/router';
 import { ApiService } from '../../services/api/api.service';
+import { NgStyle } from '@angular/common';
 
 @Component({
   selector: 'app-streamer',

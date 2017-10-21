@@ -1,4 +1,4 @@
-<section class="streamer">
+<section class="streamer dashboard animated fadeIn">
   <h1 class="streamer__title center-text">
     <a href="https://twitch.tv/{{streamerId}}" target="_blank">{{streamerId}}</a>
   </h1>
@@ -29,6 +29,7 @@
       </li>
 
       <li *ngFor="let value of twitchievements[twitchievement].values; let i = index"
+      [style.color]="twitchievement === 'colorDictionary' ? value.key : ''"
       [ngClass]="{'streamer__twitchievement__list__item--first': i === 0}"
       class="streamer__twitchievement__list__item">
         {{value.key}}: {{value.amount}}

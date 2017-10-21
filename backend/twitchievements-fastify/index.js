@@ -37,6 +37,11 @@ const twitchievementCategories = [
     description: 'EVERYONE CAN HEAR YOU IF YOU YELL IN ALL CAPS! Measures how many words a user yells.'
   },
   {
+    twitchievement: 'emoji_count',
+    displayName: 'I ❤️ Emoji',
+    description: 'If you not speaking emoji, 🤐. Measures users who most frequently use emoji'
+  },
+  {
     twitchievement: 'wordDictionary',
     displayName: 'Most Frequent Word',
     description: 'A trending word appears! Measures the most frequent word amongst the communitty.',
@@ -46,6 +51,12 @@ const twitchievementCategories = [
     twitchievement: 'emojiDictionary',
     displayName: 'Most Frequent Emoji',
     description: 'An emoji is worth a thousand words. Most frequent emojis in the chat.',
+    valueBased: true
+  },
+  {
+    twitchievement: 'colorDictionary',
+    displayName: 'Most Used Color',
+    description: 'Color says a lot about your personality. Most assigned color to users',
     valueBased: true
   },
   // {
@@ -141,10 +152,20 @@ function chatReaderRunHandler(user, fullMessage, parseResult, context) {
       emojiDictionary = Object.assign(emojiDictionary, streamer.emojiDictionary);
     }
 
+    // Get our emoji dictionary
+    let colorDictionary = {};
+    if (parseResult.colorDictionary) {
+      colorDictionary = Object.assign(colorDictionary, parseResult.colorDictionary);
+    }
+    if (streamer.colorDictionary) {
+      colorDictionary = Object.assign(colorDictionary, streamer.colorDictionary);
+    }
+
     collection.updateOne({ email }, {$set: {
       users,
       wordDictionary,
-      emojiDictionary
+      emojiDictionary,
+      colorDictionary
     }});
   });
 }

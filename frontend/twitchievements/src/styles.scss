@@ -13,6 +13,9 @@ $bg-color: $inverse;
 // Import Bulma
 @import "../node_modules/bulma/bulma.sass";
 
+// Import animate.css
+@import "./styles/animate.scss";
+
 [hidden] {
   display: none !important;
 }
