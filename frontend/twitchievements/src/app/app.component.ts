@@ -14,6 +14,14 @@ export class AppComponent {
     {
       title: 'Login',
       url: '/#/login'
+    },
+    {
+      title: 'Join',
+      url: '/#/join'
+    },
+    {
+      title: 'Dashboard',
+      url: '/#/dashboard'
     }
   ];
 }

@@ -1,5 +1,5 @@
 <h1>
-  Login
+  Join
 </h1>
 <h3>
   E-mail
@@ -9,6 +9,7 @@
   [(ngModel)]="email"
   placeholder="E-mail"
   required>
+
 <h3>
   Password
 </h3>
@@ -18,4 +19,13 @@
   placeholder="Password"
   required>
 
-<button (click)="login()" class="button is-success">Go</button>
+  <h3>
+    Confirm Password
+  </h3>
+  <input class="input"
+    type="password"
+    [(ngModel)]="confirmPassword"
+    placeholder="Password"
+    required>
+
+<button (click)="join()" class="button is-success">Go</button>
