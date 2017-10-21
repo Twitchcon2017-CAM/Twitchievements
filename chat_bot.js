@@ -12,7 +12,7 @@ var options = {
     },
     identity: {
         username: "lenny_face_bot",
-        password: 'oauth:na2hyb9rhoh6xhxon8wd8sr9sr2ys9'
+        password: 'oauth:lfdh5h0dzjvg4vyfdin2hb1web1ky7'
     },
     channels: ["cmonte905"]
 };
@@ -30,10 +30,12 @@ client.on('chat', function(channel, user, message, self) {
 
 function getWordDictionary(){
   //TODO: get the dictionary of word usage which should be contained in the stream log level of the JSON
+  return {"twitch":0, "bloody":0, "con":0};
 }
 
 function getEmojiDictionary(){
   //TODO: dictionary of emojis
+  return {"happyface":0};
 }
 
 function parse(user, msg){
