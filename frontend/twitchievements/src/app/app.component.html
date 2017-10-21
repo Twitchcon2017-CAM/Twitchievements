@@ -2,6 +2,7 @@
 <div class="container" [ngClass]="{'sass-loading-spinner__no-click': false}" aria-hidden>
   <!-- Navbar -->
   <nav>
+    <h1>Twitchievements</h1>
     <ul>
       <li *ngFor="let route of navRoutes">
         <a [href]="route.url">{{route.title}}</a>
@@ -12,5 +13,7 @@
 
   <!-- Router -->
   <!-- <base href="/"> -->
-  <router-outlet></router-outlet>
+  <main class="container__main">
+    <router-outlet></router-outlet>
+  </main>
 </div>

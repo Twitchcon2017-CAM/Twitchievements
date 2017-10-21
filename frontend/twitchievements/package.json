@@ -12,7 +12,6 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "^4.2.4",
     "@angular/common": "^4.2.4",
     "@angular/compiler": "^4.2.4",
     "@angular/core": "^4.2.4",
@@ -21,6 +20,7 @@
     "@angular/platform-browser": "^4.2.4",
     "@angular/platform-browser-dynamic": "^4.2.4",
     "@angular/router": "^4.2.4",
+    "bulma": "^0.6.0",
     "core-js": "^2.4.1",
     "rxjs": "^5.4.2",
     "sass-bem-mixins": "^1.1.6",

@@ -1,0 +1,10 @@
+@import "~styles.scss";
+
+.container {
+
+  @include element('main') {
+    color: $navbar;
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
