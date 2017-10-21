@@ -1,10 +1,16 @@
 var tmi = require('tmi.js');
 var emotes = require('./emotes.json');
 var api = require('twitch-api-v5');
+api.clientID = 'ktd1tfplvxj65uiba004h8y4jtnm8i';
 var msg_count = 0; //the number of messages sent during the stream
 
 class twitch_chat_reader {
     constructor(channel) {
+
+      this.isCurrentlyLive = false;
+      this.liveListener = false;
+      this.channel = channel;
+
         this.msg_count = 0;
         this.client = new tmi.client({
             options: {
@@ -31,20 +37,17 @@ class twitch_chat_reader {
 
     isChannelLive(channelName) {
       return new Promise((resolve, reject) => {
-
-        api.streams.live({channel:""},function(err, res) {
+        api.streams.live({channel: ""},function(err, res) {
           if (err) console.log("Error" + err);
           else {
             var stream_list = res['streams'];
-            for(var i = 0; i < stream_list.length; i++){
-            var stream = stream_list[i];
-            var channel = stream['channel'];
-            var url = channel['url'];
-            url = url.replace("https://www.twitch.tv/", "");
-            //console.log(url+" "+channelName);
-            if(url === channelName)
-            resolve("hurrah");
-
+            for(var i = 0; i < stream_list.length; i++) {
+              var stream = stream_list[i];
+              var channel = stream['channel'];
+              var url = channel['url'];
+              url = url.replace("https://www.twitch.tv/", "");
+              //console.log(url+" "+channelName);
+              if(url === channelName) resolve("hurrah");
             }
             reject("sad");
           }
@@ -52,9 +55,26 @@ class twitch_chat_reader {
       });
     }
 
-    CheckOnlineStatus(name) {
-      client.on("unhost", function(channel, viewers){
-        console.log("JS shits")
+    updateOnlineStatus() {
+
+      this.isChannelLive(this.channel).then(() => {
+
+        this.isCurrentlyLive = true;
+
+        this.liveListener = setTimeout(() => {
+          // continues listening
+          this.updateOnlineStatus();
+        }, 300000);
+        // Runs once every 5 minutes
+      }).catch(() => {
+
+        this.isCurrentlyLive = false;
+
+        this.liveListener = setTimeout(() => {
+          // continues listening
+          this.updateOnlineStatus();
+        }, 300000);
+        // Runs once every 5 minutes
       });
     }
 
@@ -130,11 +150,17 @@ class twitch_chat_reader {
     run(chatCallback, context) {
         this.client.connect();
 
+        if(!this.liveListener) {
+          this.updateOnlineStatus();
+        }
+
         this.client.on('chat', (channel, user, message) => {
+          if(this.isCurrentlyLive) {
             var user_string = user["username"];
             var user_color = user['color'];
             var message_return =  message;
             chatCallback(user_string, message_return, this.parse(user_string, message_return, user_color), context);
+          }
         });
     }
 };

@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 import 'rxjs/add/operator/retry';
+
+import { environment } from '../../../environments/environment';
 // https://xgrommx.github.io/rx-book/content/getting_started_with_rxjs/creating_and_querying_observable_sequences/creating_and_subscribing_to_simple_observable_sequences.html
 import { Observable } from 'rxjs';
 
@@ -16,9 +18,13 @@ export class ApiService {
 
   constructor(private http: HttpClient, private router: Router) {
     // TODO: Do some logic for prod
-    this.prodUrl = '//twitchievements.com/api/';
+    this.prodUrl = '';
     this.devUrl = 'http://localhost:8000';
-    this.apiUrl = this.devUrl;
+    if(environment.production) {
+      this.apiUrl = this.prodUrl;
+    } else {
+      this.apiUrl = this.devUrl;
+    }
     this.isLoading = false;
   }
 

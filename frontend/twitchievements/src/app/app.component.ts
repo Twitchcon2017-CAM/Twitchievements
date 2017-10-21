@@ -30,7 +30,7 @@ export class AppComponent {
     }
   ];
 
-  constructor(private apiService: ApiService, private router: Router) { }
+  constructor(public apiService: ApiService, private router: Router) { }
 
   logout() {
     localStorage.removeItem('token');
