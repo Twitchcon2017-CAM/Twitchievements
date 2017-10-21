@@ -68,6 +68,16 @@ class twitch_chat_reader {
 
         for (var i = 0; i < word_count; i++) {
             var word = msg_arr[i].trim();
+            var bad_word = ['a', 'the', 'in', 'or', 'of', 'to', 'on', 'at', 'as', 'an']
+            var bad = false;
+            for(var j = 0; j < bad_word.length; i++){
+              if(bad_word[j] === word){
+                bad = true;
+                break;
+              }
+            }
+            if(bad)
+              continue;
 
             // Add the word to our word dicitonary
             // Be sure to remove dots to avoid dot notation in bracket notation
