@@ -18,7 +18,7 @@ export class StreamerComponent implements OnInit {
     this.streamerId = this.route.snapshot.params['id']
     this.apiService.getStreamerStats(this.route.snapshot.params['id'])
     .subscribe(res => {
-      this.twitchievements = res;
+      this.twitchievements = res.streamTwitchievements;
 
       // Finally set our twitchievements keys
       this.twitchievementsKeys = Object.keys(this.twitchievements);

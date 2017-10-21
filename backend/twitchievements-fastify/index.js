@@ -158,7 +158,7 @@ function getCollection(db, collectionKey, callback) {
   });
 }
 
-function getStatsForUser(username, reply) {
+function getStatsForUser(username, reply, returnAwards) {
   const { db } = fastify.mongo;
 
   getCollection(db, collectionName, (err, collection) => {
@@ -182,7 +182,12 @@ function getStatsForUser(username, reply) {
         return;
       }
 
-      if (Object.keys(streamer.users).length < 5) {
+      console.log(streamer)
+
+      if (Object.keys(streamer.users).length < 5 &&
+        (!streamer.awards ||
+        Object.keys(streamer.awards).length <= 0)
+      ) {
         reply
         .code(503)
         .send('Please hang tight while we start monitoring the chat!');
@@ -240,19 +245,67 @@ function getStatsForUser(username, reply) {
           });
 
           // Pop the top 10 onto the twitchievement, and populate the user value for the twitchievement
-          userKeys.slice(0, 10).forEach((userKey) => {
+          userKeys.slice(0, 10).forEach((userKey, index) => {
             chatTwitchievements[twitchievement].users.push({
               username: userKey,
               value: streamer.users[userKey][twitchievement]
             });
+
+            // If first index, try to grant the award to a user if a twitchievement user
+            if (index == 0) {
+              collection.findOne({ twitchUsername: userKey }, (awardFindErr, awardUser) => {
+                if (awardFindErr) {
+                  // Just skip awards
+                  return;
+                }
+
+                if(awardUser) {
+                  // Look through the user's awards. Going to use dates as keys
+                  if(awardUser.awards) {
+                    Object.keys(awardUser.awards).forEach((awardKey) => {
+                      if(awardUser.awards[awardKey].stream === streamer.twitchUsername &&
+                      awardUser.awards[awardKey].twitchievement === twitchievement) {
+                        // They've already gotten this award
+                        return;
+                      }
+                    });
+                  } else {
+                    awardUser.awards = {};
+                  }
+
+                  // Give the user the award because it was not found Already
+                  const dateNow = new Date();
+                  awardUser.awards[dateNow.toString()] = {
+                    stream: streamer.twitchUsername,
+                    twitchievement: {
+                      twitchievementKey: twitchievement,
+                      displayName: twitchievementObject.displayName,
+                      description: twitchievementObject.description
+                    }
+                  }
+
+                  // Update the award user
+                  collection.updateOne({ twitchUsername: userKey }, {$set: {
+                    awards: awardUser.awards
+                  }});
+                }
+              });
+            }
           })
         }
       });
 
-      // Finally respond with our twitchievement
+      // Finally respond with our twitchievements
+      const responseTwitchievements = {
+        streamTwitchievements: chatTwitchievements
+      }
+      if(returnAwards) {
+        responseTwitchievements.userTwitchievements = streamer.awards;
+      }
+
       reply
       .code(200)
-      .send(chatTwitchievements);
+      .send(responseTwitchievements);
     });
   });
 }
@@ -301,6 +354,7 @@ fastify.post('/api/join', (request, reply) => {
           securePassword: hash,
           twitchUsername: request.body.twitchUsername,
           users: {},
+          awards: {},
           wordDictionary: {}
         }, (insertErr, result) => {
           if (insertErr) {
@@ -461,7 +515,7 @@ fastify.get('/api/stats', (request, reply) => {
     }
 
     // Get the stats for the user
-    getStatsForUser(tokenDecoded.twitchUsername, reply);
+    getStatsForUser(tokenDecoded.twitchUsername, reply, true);
   });
 });
 

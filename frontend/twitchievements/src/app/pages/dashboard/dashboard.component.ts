@@ -17,7 +17,10 @@ export class DashboardComponent implements OnInit {
 
     this.apiService.getStats()
     .subscribe(res => {
-      this.twitchievements = res;
+      this.twitchievements = res.streamTwitchievements;
+
+      console.log(res.userTwitchievements);
+      console.log(Object.keys(res.userTwitchievements));
 
       // Finally set our twitchievements keys
       this.twitchievementsKeys = Object.keys(this.twitchievements);
