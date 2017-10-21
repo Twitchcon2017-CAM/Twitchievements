@@ -10,6 +10,8 @@ export class DashboardComponent implements OnInit {
 
   twitchievements: any
   twitchievementsKeys: any
+  userTwitchievements: any
+  userTwitchievementsKeys: any
   username: any
   error: any
 
@@ -18,12 +20,17 @@ export class DashboardComponent implements OnInit {
     this.apiService.getStats()
     .subscribe(res => {
       this.twitchievements = res.streamTwitchievements;
-
-      console.log(res.userTwitchievements);
-      console.log(Object.keys(res.userTwitchievements));
+      this.userTwitchievements = res.userTwitchievements;
 
       // Finally set our twitchievements keys
-      this.twitchievementsKeys = Object.keys(this.twitchievements);
+      this.twitchievementsKeys = [];
+      if (this.twitchievements) {
+        this.twitchievementsKeys = Object.keys(this.twitchievements);
+      }
+      this.userTwitchievementsKeys = [];
+      if(this.userTwitchievements) {
+        this.userTwitchievementsKeys = Object.keys(this.userTwitchievements);
+      }
     }, err => {
       this.error = err.error;
     });
@@ -32,6 +39,10 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit() {
+  }
+
+  getDate(dateString) {
+    return new Date(dateString).toLocaleDateString();
   }
 
 }

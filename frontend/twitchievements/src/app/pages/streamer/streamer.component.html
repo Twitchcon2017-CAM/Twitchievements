@@ -4,7 +4,10 @@
   </h1>
 
   <div class="streamer__twitchievement"
-    *ngFor="let twitchievement of twitchievementsKeys">
+    *ngFor="let twitchievement of twitchievementsKeys"
+    [hidden]="(!twitchievements[twitchievement].users ||
+    twitchievements[twitchievement].users.length < 3) && (!twitchievements[twitchievement].values ||
+    twitchievements[twitchievement].values.length < 3)">
     <h1 class="streamer__twitchievement__title center-text">
       {{twitchievements[twitchievement].displayName}}
     </h1>

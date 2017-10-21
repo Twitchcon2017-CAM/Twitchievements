@@ -42,6 +42,12 @@ const twitchievementCategories = [
     description: 'A trending word appears! Measures the most frequent word amongst the communitty.',
     valueBased: true
   },
+  {
+    twitchievement: 'emojiDictionary',
+    displayName: 'Most Frequent Emoji',
+    description: 'An emoji is worth a thousand words. Most frequent emojis in the chat.',
+    valueBased: true
+  },
   // {
   //   twitchievement: 'emoji_count',
   //   displayName: 'Emojiest',
@@ -126,9 +132,19 @@ function chatReaderRunHandler(user, fullMessage, parseResult, context) {
       wordDictionary = Object.assign(wordDictionary, streamer.wordDictionary);
     }
 
+    // Get our emoji dictionary
+    let emojiDictionary = {};
+    if (parseResult.emojiDictionary) {
+      emojiDictionary = Object.assign(emojiDictionary, parseResult.emojiDictionary);
+    }
+    if (streamer.emojiDictionary) {
+      emojiDictionary = Object.assign(emojiDictionary, streamer.emojiDictionary);
+    }
+
     collection.updateOne({ email }, {$set: {
       users,
-      wordDictionary
+      wordDictionary,
+      emojiDictionary
     }});
   });
 }
@@ -182,8 +198,6 @@ function getStatsForUser(username, reply, returnAwards) {
         return;
       }
 
-      console.log(streamer)
-
       if (Object.keys(streamer.users).length < 5 &&
         (!streamer.awards ||
         Object.keys(streamer.awards).length <= 0)
@@ -208,23 +222,25 @@ function getStatsForUser(username, reply, returnAwards) {
           chatTwitchievements[twitchievement].values = [];
 
           // Find and sort the object on the streamer
-          const valueKeys = Object.keys(streamer[twitchievement]);
-          valueKeys.sort((a, b) => {
-            if(streamer[twitchievement][a] > streamer[twitchievement][b]) {
-              return -1;
-            }
-            if(streamer[twitchievement][a] < streamer[twitchievement][b]) {
-              return 1;
-            }
-            return 0;
-          });
-
-          valueKeys.slice(0, 10).forEach(valueKey => {
-            chatTwitchievements[twitchievement].values.push({
-              key: valueKey,
-              amount: streamer[twitchievement][valueKey]
+          if(streamer[twitchievement]) {
+            const valueKeys = Object.keys(streamer[twitchievement]);
+            valueKeys.sort((a, b) => {
+              if(streamer[twitchievement][a] > streamer[twitchievement][b]) {
+                return -1;
+              }
+              if(streamer[twitchievement][a] < streamer[twitchievement][b]) {
+                return 1;
+              }
+              return 0;
             });
-          });
+
+            valueKeys.slice(0, 10).forEach(valueKey => {
+              chatTwitchievements[twitchievement].values.push({
+                key: valueKey,
+                amount: streamer[twitchievement][valueKey]
+              });
+            });
+          }
         } else {
           // Handle User based Twitcheivements
           chatTwitchievements[twitchievement].users = [];
@@ -245,53 +261,56 @@ function getStatsForUser(username, reply, returnAwards) {
           });
 
           // Pop the top 10 onto the twitchievement, and populate the user value for the twitchievement
-          userKeys.slice(0, 10).forEach((userKey, index) => {
+          const userKeySlice = userKeys.slice(0, 10)
+          userKeySlice.forEach((userKey, index) => {
             chatTwitchievements[twitchievement].users.push({
               username: userKey,
               value: streamer.users[userKey][twitchievement]
             });
+          });
 
-            // If first index, try to grant the award to a user if a twitchievement user
-            if (index == 0) {
-              collection.findOne({ twitchUsername: userKey }, (awardFindErr, awardUser) => {
-                if (awardFindErr) {
-                  // Just skip awards
-                  return;
-                }
-
-                if(awardUser) {
-                  // Look through the user's awards. Going to use dates as keys
-                  if(awardUser.awards) {
-                    Object.keys(awardUser.awards).forEach((awardKey) => {
-                      if(awardUser.awards[awardKey].stream === streamer.twitchUsername &&
-                      awardUser.awards[awardKey].twitchievement === twitchievement) {
-                        // They've already gotten this award
-                        return;
-                      }
-                    });
-                  } else {
-                    awardUser.awards = {};
-                  }
-
-                  // Give the user the award because it was not found Already
-                  const dateNow = new Date();
-                  awardUser.awards[dateNow.toString()] = {
-                    stream: streamer.twitchUsername,
-                    twitchievement: {
-                      twitchievementKey: twitchievement,
-                      displayName: twitchievementObject.displayName,
-                      description: twitchievementObject.description
-                    }
-                  }
-
-                  // Update the award user
-                  collection.updateOne({ twitchUsername: userKey }, {$set: {
-                    awards: awardUser.awards
-                  }});
-                }
-              });
+          // Try to add the award to the first user
+          collection.findOne({ twitchUsername: userKeySlice[0] }, (awardFindErr, awardUser) => {
+            if (awardFindErr) {
+              // Just skip awards
+              return;
             }
-          })
+
+            if(awardUser) {
+              userHasAward = false;
+              // Look through the user's awards. Going to use dates as keys
+              if(awardUser.awards) {
+                Object.keys(awardUser.awards).forEach((awardKey) => {
+                  if(awardUser.awards[awardKey].stream === streamer.twitchUsername &&
+                  awardUser.awards[awardKey].twitchievement &&
+                  awardUser.awards[awardKey].twitchievement.twitchievementKey === twitchievement) {
+                    // They've already gotten this award
+                    userHasAward = true;
+                  }
+                });
+              } else {
+                awardUser.awards = {};
+              }
+
+              if(!userHasAward) {
+                // Give the user the award because it was not found Already
+                const dateNow = new Date();
+                awardUser.awards[dateNow.toString()] = {
+                  stream: streamer.twitchUsername,
+                  twitchievement: {
+                    twitchievementKey: twitchievement,
+                    displayName: twitchievementObject.displayName,
+                    description: twitchievementObject.description
+                  }
+                }
+
+                // Update the award user
+                collection.updateOne({ twitchUsername: userKeySlice[0] }, {$set: {
+                  awards: awardUser.awards
+                }});
+              }
+            }
+          });
         }
       });
 
