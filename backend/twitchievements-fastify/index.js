@@ -1,6 +1,10 @@
 // Require the framework and instantiate it
 const fastify = require('fastify')();
 
+// Import our chat bot
+const twitchChatReader = require('./chat_bot');
+const chatReaders = [];
+
 // CORS
 fastify.use(require('cors')());
 
@@ -14,15 +18,77 @@ fastify.register(require('fastify-jwt'), { secret: 'supersecretfortwitchievement
   if (err) throw err
 });
 
-// Initialize mongo
+// Initialize mongo, fs for testing
+const collectionName = 'streamers';
+var fs = require('fs');
 fastify.register(require('fastify-mongodb'), {
   url: 'mongodb://localhost/twitchievements'
 }, err => {
   if (err) throw err
+
+  // Now that we have mongo, let's watch our user's streams
+  const { db } = fastify.mongo;
+  getCollection(db, collectionName, (collectionErr, collection) => {
+    if (collectionErr) throw colelctionErr;
+
+    // Iterate all of our streamers
+    // https://stackoverflow.com/questions/24215021/how-do-i-iterate-over-an-entire-mongodb-collection-using-mongojs
+
+    const cursor = collection.find();
+    // Execute the each command, triggers for each document
+    cursor.each(function(err, item) {
+      // If the item is null then the cursor is exhausted/empty and closed
+      if(item == null) {
+        return;
+      }
+
+      // Start a chat bot reader for our streamer
+      const chatReader = new twitchChatReader(item.twitchUsername);
+      chatReader.run((user, fullMessage, parseResult) => {
+        //console.log(`${user} / ${fullMessage} / ${JSON.stringify(parseResult, null, 4)}`);
+        //fs.appendFileSync('message.txt', `${user} / ${fullMessage} / ${parseResult}`);
+
+        // Save to the specified user in streamer object
+        collection.findOne({ email: item.email }, (streamerFindErr, streamer) => {
+          if (streamerFindErr) {
+            throw err;
+          }
+
+          // First check if the user exists
+          if (!streamer.users[user]) {
+            streamer.users[user] = parseResult;
+            console.log(streamer.users);
+          } else {
+            // Update the values on the user
+            Object.keys(parseResult).forEach(parseKey => {
+              //if the key exists on the user, add, else set
+              if(streamer.users[user][parseKey]) {
+                streamer.users[user][parseKey] += parseResult[parseKey];
+              } else {
+                streamer.users[user][parseKey] += parseResult[parseKey];
+              }
+            });
+          }
+
+          collection.updateOne({ email: item.email }, streamer, (updateErr) => {
+            if (updateErr) {
+              throw err;
+            }
+            //console.log(user);
+            console.log(JSON.stringify(streamer.users, null, 4));
+            //console.log(JSON.stringify(parseResult, null, 4));
+          });
+        });
+      });
+
+      // Add the chat reader to our readers
+      chatReaders.push(chatReader);
+    });
+  });
 });
-const collectionName = 'streamers';
 
 // Function to get our collection
+// Pass our db, the collection we are getting, and a callback for when it is found
 function getCollection(db, collectionKey, callback) {
   db.collection(collectionKey, (err, collection) => {
     if(err) {
@@ -141,6 +207,7 @@ fastify.post('/api/login', (request, reply) => {
         return;
       }
 
+      // Verify the password with the hash stored int he DB
       pwd.verify(Buffer.from(request.body.password), user.securePassword.buffer, (passErr, result) => {
         if (passErr) {
           reply

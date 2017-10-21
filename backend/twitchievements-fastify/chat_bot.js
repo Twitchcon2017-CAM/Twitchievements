@@ -1,5 +1,4 @@
 var tmi = require('tmi.js');
-var fs = require('fs');
 var msg_count = 0; //the number of messages sent during the stream
 
 class twitch_chat_reader {
@@ -21,14 +20,13 @@ class twitch_chat_reader {
         });
     }
 
-    run() {
+    run(chatCallback) {
         this.client.connect();
 
         this.client.on('chat', function(channel, user, message, self) {
             var user_string = user["username"];
             var message_return = user_string + " " + message + "\n";
-            parse(user_string, message_return)
-            fs.appendFileSync('message.txt', message_return);
+            chatCallback(user_string, message_return, parse(user_string, message_return));
         });
 
         function getWordDictionary() {
@@ -42,7 +40,6 @@ class twitch_chat_reader {
         }
 
         function parse(user, msg) {
-            //console.log(msg);
             msg_count++;
             var msg_arr = msg.split(" "); //split the message into array of string by whitespace
             var word_count = msg_arr.length; //get the count, this will be summed to the user's chattiness
@@ -67,13 +64,16 @@ class twitch_chat_reader {
                     caps_count++;
                 }
             }
-            console.log(msg_count+" "+word_count+" "+caps_count+" "+emoji_count);
+            const response = {
+              msg_count,
+              word_count,
+              caps_count,
+              emoji_count
+            }
+            return response;
         }
     }
 };
 
-
-var cli = new twitch_chat_reader('riotgames');
-cli.run();
-
-
+// Export the thing
+module.exports = twitch_chat_reader;

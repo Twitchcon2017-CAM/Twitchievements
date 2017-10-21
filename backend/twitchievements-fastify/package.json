@@ -21,6 +21,7 @@
     "fastify": "^0.30.2",
     "fastify-jwt": "^0.1.0",
     "fastify-mongodb": "^0.1.0",
-    "secure-password": "^2.1.1"
+    "secure-password": "^2.1.1",
+    "tmi.js": "^1.2.1"
   }
 }
