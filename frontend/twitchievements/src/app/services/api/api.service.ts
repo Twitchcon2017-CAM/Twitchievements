@@ -18,7 +18,7 @@ export class ApiService {
 
   constructor(private http: HttpClient, private router: Router) {
     // TODO: Do some logic for prod
-    this.prodUrl = '/api';
+    this.prodUrl = '';
     this.devUrl = 'http://localhost:8000';
     if(environment.production) {
       this.apiUrl = this.prodUrl;
