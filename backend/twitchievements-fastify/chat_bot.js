@@ -90,7 +90,7 @@ class twitch_chat_reader {
             var word = msg_arr[i].trim();
             var bad_word = ['a', 'the', 'in', 'or', 'of', 'to', 'on', 'at', 'as', 'an']
             var bad = false;
-            for(var j = 0; j < bad_word.length; i++){
+            for(var j = 0; j < bad_word.length; j++){
               if(bad_word[j] === word){
                 bad = true;
                 break;
