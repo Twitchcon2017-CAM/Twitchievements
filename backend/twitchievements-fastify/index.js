@@ -3,7 +3,7 @@ const fastify = require('fastify')();
 
 // Import our chat bot
 const twitchChatReader = require('./chat_bot');
-const chatReaders = [];
+const chatReaders = {};
 
 // CORS
 fastify.use(require('cors')());
@@ -29,7 +29,7 @@ fastify.register(require('fastify-mongodb'), {
   // Now that we have mongo, let's watch our user's streams
   const { db } = fastify.mongo;
   getCollection(db, collectionName, (collectionErr, collection) => {
-    if (collectionErr) throw colelctionErr;
+    if (collectionErr) throw collectionErr;
 
     // Iterate all of our streamers
     // https://stackoverflow.com/questions/24215021/how-do-i-iterate-over-an-entire-mongodb-collection-using-mongojs
@@ -45,44 +45,34 @@ fastify.register(require('fastify-mongodb'), {
       // Start a chat bot reader for our streamer
       const chatReader = new twitchChatReader(item.twitchUsername);
       chatReader.run((user, fullMessage, parseResult) => {
-        //console.log(`${user} / ${fullMessage} / ${JSON.stringify(parseResult, null, 4)}`);
-        //fs.appendFileSync('message.txt', `${user} / ${fullMessage} / ${parseResult}`);
-
         // Save to the specified user in streamer object
         collection.findOne({ email: item.email }, (streamerFindErr, streamer) => {
           if (streamerFindErr) {
             throw err;
           }
 
+          const users = streamer.users;
+
           // First check if the user exists
-          if (!streamer.users[user]) {
-            streamer.users[user] = parseResult;
-            console.log(streamer.users);
+          if (!users[user]) {
+            users[user] = parseResult;
           } else {
             // Update the values on the user
             Object.keys(parseResult).forEach(parseKey => {
-              //if the key exists on the user, add, else set
-              if(streamer.users[user][parseKey]) {
-                streamer.users[user][parseKey] += parseResult[parseKey];
+              // if the key exists on the user, add, else set
+              if(users[user][parseKey]) {
+                users[user][parseKey] += parseResult[parseKey];
               } else {
-                streamer.users[user][parseKey] += parseResult[parseKey];
+                users[user][parseKey] += parseResult[parseKey];
               }
             });
           }
-
-          collection.updateOne({ email: item.email }, streamer, (updateErr) => {
-            if (updateErr) {
-              throw err;
-            }
-            //console.log(user);
-            console.log(JSON.stringify(streamer.users, null, 4));
-            //console.log(JSON.stringify(parseResult, null, 4));
-          });
+          collection.updateOne({ email: item.email }, {$set: { users }});
         });
       });
 
       // Add the chat reader to our readers
-      chatReaders.push(chatReader);
+      chatReaders[item.twitchUsername] = chatReader;
     });
   });
 });
@@ -155,7 +145,7 @@ fastify.post('/api/join', (request, reply) => {
           email: request.body.email,
           securePassword: hash,
           twitchUsername: request.body.twitchUsername,
-          users: []
+          users: {}
         }, (insertErr, result) => {
           if (insertErr) {
             reply
