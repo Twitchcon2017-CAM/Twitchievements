@@ -21,7 +21,7 @@ export class ApiService {
     this.prodUrl = '/api';
     this.devUrl = 'http://localhost:8000';
     if(environment.production) {
-      this.apiUrl = this.devUrl;
+      this.apiUrl = this.prodUrl;
     } else {
       this.apiUrl = this.devUrl;
     }
