@@ -8,7 +8,7 @@ https://twitchievements.aaronthedev.com, http://twitchievements.aaronthedev.com 
   }
 }
 
-https://twitcheivements.aaronthedev.com, http://twitcheivements.aaronthedev.com, {
+https://twitcheivements.aaronthedev.com, http://twitcheivements.aaronthedev.com {
   root frontend/twitchievements/dist
   gzip
 
