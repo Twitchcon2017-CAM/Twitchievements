@@ -12,12 +12,14 @@ export class ApiService {
   prodUrl: string
   devUrl: string
   apiUrl: string
+  isLoading: boolean
 
   constructor(private http: HttpClient, private router: Router) {
     // TODO: Do some logic for prod
     this.prodUrl = '//twitchievements.com/api/';
     this.devUrl = 'http://localhost:8000';
     this.apiUrl = this.devUrl;
+    this.isLoading = false;
   }
 
   // Function to check for our jwt and bounce us to routes
@@ -34,6 +36,7 @@ export class ApiService {
   }
 
   login(email, password) {
+    this.isLoading = true;
     return Observable.create(observer => {
       this.http.post(this.apiUrl + '/api/login', {
         email,
@@ -42,14 +45,17 @@ export class ApiService {
       .subscribe(res => {
         // handle Response
         observer.next(res);
+        this.isLoading = false;
       }, err => {
         // TODO:
         observer.error(err);
+        this.isLoading = false;
       });
     })
   }
 
   join(email, password, twitchUsername) {
+    this.isLoading = true;
     return Observable.create(observer => {
       this.http.post(this.apiUrl + '/api/join', {
         email,
@@ -59,15 +65,17 @@ export class ApiService {
       .subscribe(res => {
         // handle Response
         observer.next(res);
+        this.isLoading = false;
       }, err => {
         // TODO:
         observer.error(err);
+        this.isLoading = false;
       });
     })
   }
 
   getStats() {
-    // TODO: grab a token
+    this.isLoading = true;
     return Observable.create(observer => {
       this.http.get(this.apiUrl + '/api/stats', {
         headers: new HttpHeaders().set('token', localStorage.getItem('token'))
@@ -76,24 +84,29 @@ export class ApiService {
       .subscribe(res => {
         // handle Response
         observer.next(res);
+        this.isLoading = false;
       }, err => {
         // TODO:
         observer.error(err);
+        this.isLoading = false;
       });
     })
   }
 
   // No Toekn Required for this route
   getStreamerStats(streamer: string) {
+    this.isLoading = true;
     return Observable.create(observer => {
       this.http.get(this.apiUrl + '/api/stats/' + streamer)
       .retry(1)
       .subscribe(res => {
         // handle Response
         observer.next(res);
+        this.isLoading = false;
       }, err => {
         // TODO:
         observer.error(err);
+        this.isLoading = false;
       });
     })
   }

@@ -1,5 +1,12 @@
 @import "~styles.scss";
 
+.sass-loading-spinner {
+  @include element('title') {
+    color: $standard;
+    font-size: 24px;
+  }
+}
+
 .app {
 
   @include element('nav') {

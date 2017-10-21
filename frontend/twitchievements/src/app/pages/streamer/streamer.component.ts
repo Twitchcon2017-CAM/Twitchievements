@@ -12,6 +12,7 @@ export class StreamerComponent implements OnInit {
   twitchievements: any
   twitchievementsKeys: any
   streamerId: string
+  error: any
 
   constructor(private apiService: ApiService, private route: ActivatedRoute) {
     this.streamerId = this.route.snapshot.params['id']
@@ -22,7 +23,7 @@ export class StreamerComponent implements OnInit {
       // Finally set our twitchievements keys
       this.twitchievementsKeys = Object.keys(this.twitchievements);
     }, err => {
-      //TODO
+      this.error = err.error;
     });
   }
 

@@ -37,11 +37,13 @@ class twitch_chat_reader {
 
             // Add the word to our word dicitonary
             // Be sure to remove dots to avoid dot notation in bracket notation
-            const wordNoDots = word.replace(/\./g, '')
-            if(this.wordDictionary[wordNoDots]) {
-              this.wordDictionary[wordNoDots]++;
+            let wordHashFriendly = word;
+            wordHashFriendly = wordHashFriendly.replace(/\./g, '');
+            wordHashFriendly = wordHashFriendly.replace(/\$/g, '');
+            if(this.wordDictionary[wordHashFriendly]) {
+              this.wordDictionary[wordHashFriendly]++;
             } else {
-              this.wordDictionary[wordNoDots] = 1;
+              this.wordDictionary[wordHashFriendly] = 1;
             }
 
             // Start our emjoi dictionary
@@ -64,13 +66,13 @@ class twitch_chat_reader {
         return response;
     }
 
-    run(chatCallback) {
+    run(chatCallback, context) {
         this.client.connect();
 
         this.client.on('chat', (channel, user, message) => {
             var user_string = user["username"];
             var message_return = user_string + " " + message;
-            chatCallback(user_string, message_return, this.parse(user_string, message_return));
+            chatCallback(user_string, message_return, this.parse(user_string, message_return), context);
         });
     }
 };

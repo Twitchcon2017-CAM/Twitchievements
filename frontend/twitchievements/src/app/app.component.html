@@ -1,5 +1,31 @@
-<!-- TODO: add logic for loadin -->
-<div class="app" [ngClass]="{'sass-loading-spinner__no-click': false}" aria-hidden>
+<!-- Loading Spinner -->
+<!-- Overlay for loading spinner -->
+<div [hidden]="!apiService.isLoading">
+  <div class="sass-loading-spinner__dark-overlay">
+  </div>
+
+  <!-- Centered Modal for the loading spinner -->
+  <div class="sass-loading-spinner__modal">
+
+    <!-- Title for the Modal -->
+    <h1 class="sass-loading-spinner__title">
+      Loading...
+    </h1>
+
+    <!-- Anything can be placed inside the modal -->
+
+    <!-- The loading spinner itself -->
+    <div class="sass-loading-spinner__spinner">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+<div class="app" [ngClass]="{'sass-loading-spinner__no-click': apiService.isLoading}" aria-hidden>
   <!-- Navbar -->
   <nav class="app__nav">
     <h1 class="app__nav__list__item">Twitchievements</h1>

@@ -10,6 +10,8 @@ export class DashboardComponent implements OnInit {
 
   twitchievements: any
   twitchievementsKeys: any
+  username: any
+  error: any
 
   constructor(private apiService: ApiService) {
 
@@ -20,8 +22,10 @@ export class DashboardComponent implements OnInit {
       // Finally set our twitchievements keys
       this.twitchievementsKeys = Object.keys(this.twitchievements);
     }, err => {
-      //TODO
+      this.error = err.error;
     });
+
+    this.username = localStorage.getItem('twitchUsername');
   }
 
   ngOnInit() {

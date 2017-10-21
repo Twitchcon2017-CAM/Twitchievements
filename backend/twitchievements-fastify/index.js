@@ -75,43 +75,63 @@ fastify.register(require('fastify-mongodb'), {
 
       // Start a chat bot reader for our streamer
       const chatReader = new twitchChatReader(item.twitchUsername);
-      chatReader.run((user, fullMessage, parseResult) => {
-        // TODO: Remove this debug code
-        //console.log(fullMessage);
-        // Save to the specified user in streamer object
-        collection.findOne({ email: item.email }, (streamerFindErr, streamer) => {
-          if (streamerFindErr) {
-            throw err;
-          }
-
-          const users = streamer.users;
-
-          // First check if the user exists
-          if (!users[user]) {
-            users[user] = parseResult;
-          } else {
-            // Update the values on the user
-            Object.keys(parseResult).forEach(parseKey => {
-              // if the key exists on the user, add, else set
-              if(users[user][parseKey]) {
-                users[user][parseKey] += parseResult[parseKey];
-              } else {
-                users[user][parseKey] += parseResult[parseKey];
-              }
-            });
-          }
-          collection.updateOne({ email: item.email }, {$set: {
-            users,
-            wordDictionary: parseResult.wordDictionary
-          }});
-        });
+      chatReader.run(chatReaderRunHandler, {
+        email: item.email,
+        collection
       });
-
       // Add the chat reader to our readers
       chatReaders[item.twitchUsername] = chatReader;
     });
   });
 });
+
+
+// Run handler for chat.run objects.
+// COntext must conatin email and collection
+function chatReaderRunHandler(user, fullMessage, parseResult, context) {
+
+  // Break out our ocntext
+  const email = context.email;
+  const collection = context.collection;
+
+  // Save to the specified user in streamer object
+  collection.findOne({ email }, (streamerFindErr, streamer) => {
+    if (streamerFindErr) {
+      throw err;
+    }
+
+    const users = streamer.users;
+
+    // First check if the user exists
+    if (!users[user]) {
+      users[user] = parseResult;
+    } else {
+      // Update the values on the user
+      Object.keys(parseResult).forEach(parseKey => {
+        // if the key exists on the user, add, else set
+        if(users[user][parseKey]) {
+          users[user][parseKey] += parseResult[parseKey];
+        } else {
+          users[user][parseKey] += parseResult[parseKey];
+        }
+      });
+    }
+
+    // Get our word dictionary
+    let wordDictionary = {};
+    if (parseResult.wordDictionary) {
+      wordDictionary = Object.assign(wordDictionary, parseResult.wordDictionary);
+    }
+    if (streamer.wordDictionary) {
+      wordDictionary = Object.assign(wordDictionary, streamer.wordDictionary);
+    }
+
+    collection.updateOne({ email }, {$set: {
+      users,
+      wordDictionary
+    }});
+  });
+}
 
 // Function to get our collection
 // Pass our db, the collection we are getting, and a callback for when it is found
@@ -155,10 +175,17 @@ function getStatsForUser(username, reply) {
         .send('Error finding the specified User');
       }
 
-      if(!streamer) {
+      if (!streamer) {
         reply
         .code(404)
         .send('Streamer Not registered with twitchievements');
+        return;
+      }
+
+      if (Object.keys(streamer.users).length < 5) {
+        reply
+        .code(503)
+        .send('Please hang tight while we start monitoring the chat!');
         return;
       }
 
@@ -171,7 +198,6 @@ function getStatsForUser(username, reply) {
           displayName: twitchievementObject.displayName,
           description: twitchievementObject.description,
         };
-
         // Handle Value Based twitchievements
         if(twitchievementObject.valueBased) {
           chatTwitchievements[twitchievement].values = [];
@@ -284,6 +310,15 @@ fastify.post('/api/join', (request, reply) => {
             return;
           }
 
+          // Start a chat bot reader for our streamer
+          const chatReader = new twitchChatReader(request.body.twitchUsername);
+          chatReader.run(chatReaderRunHandler, {
+            email: request.body.email,
+            collection
+          });
+          // Add the chat reader to our readers
+          chatReaders[request.body.twitchUsername] = chatReader;
+
           // Generate a JWT for the user
           const token = fastify.jwt.sign({
             email: request.body.email,
@@ -292,7 +327,11 @@ fastify.post('/api/join', (request, reply) => {
 
           reply
           .code(200)
-          .send({token});
+          .send({
+            token,
+            email: request.body.email,
+            twitchUsername: request.body.twitchUsername
+          });
         });
       });
     });
@@ -357,7 +396,11 @@ fastify.post('/api/login', (request, reply) => {
 
             reply
             .code(200)
-            .send({ token });
+            .send({
+              token,
+              email: request.body.email,
+              twitchUsername: user.twitchUsername
+            });
             return;
         }
         if (result === securePassword.VALID_NEEDS_REHASH) {
@@ -403,7 +446,8 @@ fastify.get('/api/stats', (request, reply) => {
   // Error if no token
   if(!request.headers.token) {
     reply
-    .code(400);
+    .code(400)
+    .send('No Free wristbands');
     return;
   }
 
@@ -411,7 +455,8 @@ fastify.get('/api/stats', (request, reply) => {
   fastify.jwt.verify(request.headers.token, tokenSecret, function(err, tokenDecoded) {
     if (err) {
       reply
-      .code(401);
+      .code(401)
+      .send('Unauthorized. Imma call the cops');
       return;
     }
 

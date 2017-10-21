@@ -21,6 +21,8 @@ export class LoginComponent implements OnInit {
     this.apiService.login(this.email, this.password)
     .subscribe(res => {
       localStorage.setItem('token', res.token);
+      localStorage.setItem('email', res.email);
+      localStorage.setItem('twitchUsername', res.twitchUsername);
       this.router.navigateByUrl('/dashboard');
     }, err => {
       //

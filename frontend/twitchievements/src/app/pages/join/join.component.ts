@@ -23,9 +23,12 @@ export class JoinComponent implements OnInit {
     // TODO: Check for confirm password
     this.apiService.join(this.email, this.password, this.twitchUsername)
     .subscribe(res => {
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('email', res.email);
+      localStorage.setItem('twitchUsername', res.twitchUsername);
       this.router.navigateByUrl('/dashboard')
     }, err => {
-      //
+      //TODO
     });
   }
 
