@@ -1,4 +1,30 @@
 @import "~styles.scss";
-.home {
 
+.home {
+  @include element('title') {
+    font-size: 48px;
+  }
+
+  @include element('subtitle') {
+    font-size: 24px;
+    color: $sub-standard;
+    margin-top: 10px;
+    margin-bottom: 10px;
+  }
+
+  @include element('auth-button') {
+    margin: 0px;
+
+    @include modifier('left') {
+      margin-right: 10px;
+    }
+
+    @include modifier('right') {
+      margin-left: 10px;
+    }
+  }
+
+  @include element('questions') {
+    margin-top: 20px;
+  }
 }

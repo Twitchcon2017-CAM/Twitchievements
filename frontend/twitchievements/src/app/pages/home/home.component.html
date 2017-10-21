@@ -1,9 +1,26 @@
 <div class="home">
-  <h1>Twitchievements</h1>
-  <h3>Gamify your chat</h3>
-  <p>
-    Aye this is some cool info.
-  </p>
-  <a class="button is-link" href="/#/login">Login</a>
-  <a class="button is-info" href="/#/join">Join</a>
+
+  <section class="center-text">
+    <h1 class="home__title">Twitchievements</h1>
+    <h3 class="home__subtitle">Gamify your chat</h3>
+    <a class="button is-link home__auth-button--left"
+      href="/#/join"
+      [hidden]="apiService && apiService.hasAuth()">
+      Join
+    </a>
+    <a class="button is-info home__auth-button--right"
+      href="/#/login"
+      [hidden]="apiService && apiService.hasAuth()">
+      Log In
+    </a>
+  </section>
+
+  <section class="home__questions">
+    <h3 class="home__subtitle">
+      What is Twitchievements?
+    </h3>
+    <p>
+      It is cool.
+    </p>
+  </section>
 </div>

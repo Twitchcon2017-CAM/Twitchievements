@@ -1,0 +1,12 @@
+@import "~styles.scss";
+
+.join {
+
+  @include element('title') {
+    font-size: 48px;
+  }
+
+  @include element('button') {
+    margin-top: 10px;
+  }
+}

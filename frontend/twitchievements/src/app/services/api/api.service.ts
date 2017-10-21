@@ -25,6 +25,14 @@ export class ApiService {
     this.router.navigateByUrl('/#/')
   }
 
+  hasAuth() {
+    if (localStorage.getItem('token')) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   login(email, password) {
     return Observable.create(observer => {
       this.http.post(this.apiUrl + '/api/login', {

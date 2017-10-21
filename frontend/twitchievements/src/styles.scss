@@ -12,3 +12,20 @@ $bg-color: $inverse;
 
 // Import Bulma
 @import "../node_modules/bulma/bulma.sass";
+
+[hidden] {
+  display: none !important;
+}
+
+a {
+  color: $links;
+
+  &:visited {
+    color: $links;
+  }
+}
+
+html, body {
+  max-width: 100% !important;
+  background-color: $inverse;
+}

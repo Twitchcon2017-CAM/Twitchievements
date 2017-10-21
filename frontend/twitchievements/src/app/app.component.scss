@@ -1,9 +1,32 @@
 @import "~styles.scss";
 
-.container {
+.app {
 
-  @include element('main') {
-    color: $navbar;
+  @include element('nav') {
+    background-color: $navbar;
+    color: $inverse;
+
+    display: flex;
+    flex-wrap: wrap;
+
+    padding: 10px;
+
+    a:hover {
+      color: $inverse;
+    }
+
+    @include element('list') {
+      display: flex;
+      flex-wrap: wrap;
+
+      @include element('item') {
+        margin-left: 5px;
+        margin-right: 5px;
+      }
+    }
+  }
+
+  @include element('container') {
     padding-left: 10px;
     padding-right: 10px;
   }

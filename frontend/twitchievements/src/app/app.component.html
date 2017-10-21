@@ -1,11 +1,21 @@
 <!-- TODO: add logic for loadin -->
-<div class="container" [ngClass]="{'sass-loading-spinner__no-click': false}" aria-hidden>
+<div class="app" [ngClass]="{'sass-loading-spinner__no-click': false}" aria-hidden>
   <!-- Navbar -->
-  <nav>
-    <h1>Twitchievements</h1>
-    <ul>
-      <li *ngFor="let route of navRoutes">
-        <a [href]="route.url">{{route.title}}</a>
+  <nav class="app__nav">
+    <h1 class="app__nav__list__item">Twitchievements</h1>
+    <ul class="app__nav__list">
+      <li *ngFor="let route of navRoutes"
+        class="app__nav__list__item"
+        [hidden]="apiService &&
+        ((apiService.hasAuth() && route.hideOnAuth) ||
+        (!apiService.hasAuth() && route.requiresAuth))">
+          <a [href]="route.url">{{route.title}}</a>
+      </li>
+
+      <li class="app__nav__list__item"
+      [hidden]="apiService && !apiService.hasAuth()"
+      (click)="logout()">
+        <a href="/#/">Logout</a>
       </li>
     </ul>
   </nav>
@@ -13,7 +23,7 @@
 
   <!-- Router -->
   <!-- <base href="/"> -->
-  <main class="container__main">
+  <main class="app__container">
     <router-outlet></router-outlet>
   </main>
 </div>
