@@ -1,0 +1,25 @@
+{
+  "name": "twitchievements-fastify-backend",
+  "version": "1.0.0",
+  "description": "Backend for twitcheivements in fastify",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Twitchcon2017-CAM/Twitchievements.git"
+  },
+  "author": "CAM",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Twitchcon2017-CAM/Twitchievements/issues"
+  },
+  "homepage": "https://github.com/Twitchcon2017-CAM/Twitchievements#readme",
+  "dependencies": {
+    "fastify": "^0.30.2",
+    "fastify-jwt": "^0.1.0",
+    "fastify-mongodb": "^0.1.0",
+    "secure-password": "^2.1.1"
+  }
+}
