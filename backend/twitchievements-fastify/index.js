@@ -14,9 +14,18 @@ const securePassword = require('secure-password');
 const pwd = securePassword();
 
 // Initialize JWTs
-fastify.register(require('fastify-jwt'), { secret: 'supersecretfortwitchievements' }, err => {
+const tokenSecret = 'supersecretfortwitchievements';
+fastify.register(require('fastify-jwt'), { secret: tokenSecret }, err => {
   if (err) throw err
 });
+
+// Define Our categories
+const twitchievementCategories = [
+  'msg_count',
+  'word_count',
+  'caps_count',
+  'emoji_count'
+];
 
 // Initialize mongo, fs for testing
 const collectionName = 'streamers';
@@ -45,6 +54,8 @@ fastify.register(require('fastify-mongodb'), {
       // Start a chat bot reader for our streamer
       const chatReader = new twitchChatReader(item.twitchUsername);
       chatReader.run((user, fullMessage, parseResult) => {
+        // TODO: Remove this debug code
+        //console.log(fullMessage);
         // Save to the specified user in streamer object
         collection.findOne({ email: item.email }, (streamerFindErr, streamer) => {
           if (streamerFindErr) {
@@ -102,6 +113,69 @@ function getCollection(db, collectionKey, callback) {
   });
 }
 
+function getStatsForUser(username, reply) {
+  const { db } = fastify.mongo;
+
+  getCollection(db, collectionName, (err, collection) => {
+    if (err) {
+      reply.send(err);
+      return;
+    }
+
+    // Find the streamer
+    collection.findOne({ twitchUsername: username }, (findErr, streamer) => {
+      if (findErr) {
+        reply
+        .code(500)
+        .send('Error finding the specified User');
+      }
+
+      if(!streamer) {
+        reply
+        .code(404)
+        .send('Streamer Not registered with twitchievements');
+        return;
+      }
+
+      const chatTwitchievements = {};
+
+      // Find Top 5 of each key
+      twitchievementCategories.forEach(twitchievement => {
+        chatTwitchievements[twitchievement] = [];
+
+        // Iterate through all of the streamers users and sort by the category
+        // Getting the keys of all the users, and then comparing them to the specified category on the user
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort
+        const userKeys = Object.keys(streamer.users);
+        userKeys.sort((a, b) => {
+          if(!streamer.users[b][twitchievement] ||
+            streamer.users[b][twitchievement] < streamer.users[a][twitchievement]) {
+            return -1;
+          }
+          if(streamer.users[b][twitchievement] > streamer.users[a][twitchievement]) {
+            return 1;
+          }
+
+          return 0;
+        });
+
+        // Pop the top 10 onto the twitchievement, and populate the user value for the twitchievement
+        userKeys.slice(0, 10).forEach((userKey) => {
+          chatTwitchievements[twitchievement].push({
+            username: userKey,
+            value: streamer.users[userKey][twitchievement]
+          });
+        })
+      });
+
+      // Finally respond with our twitchievement
+      reply
+      .code(200)
+      .send(chatTwitchievements);
+    });
+  });
+}
+
 
 // Declare a route
 fastify.post('/api/join', (request, reply) => {
@@ -115,7 +189,7 @@ fastify.post('/api/join', (request, reply) => {
     return;
   }
 
-  // Check for the Email existing
+  // Get our streamers collection
   getCollection(db, collectionName, (err, collection) => {
     if (err) {
       reply.send(err);
@@ -266,6 +340,34 @@ fastify.post('/api/login', (request, reply) => {
       });
     });
   });
+});
+
+// Get Stats for the current user
+fastify.get('/api/stats', (request, reply) => {
+  // Error if no token
+  if(!request.headers.token) {
+    reply
+    .code(400);
+    return;
+  }
+
+  // Get the token
+  fastify.jwt.verify(request.headers.token, tokenSecret, function(err, tokenDecoded) {
+    if (err) {
+      reply
+      .code(401);
+      return;
+    }
+
+    // Get the stats for the user
+    getStatsForUser(tokenDecoded.twitchUsername, reply);
+  });
+});
+
+// Get Stats for the passed user
+fastify.get('/api/stats/:params', (request, reply) => {
+  // Get the stats for the user
+  getStatsForUser(request.params.params, reply);
 });
 
 // Run the server!
