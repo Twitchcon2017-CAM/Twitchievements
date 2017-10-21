@@ -21,18 +21,21 @@ class twitch_chat_reader {
         });
         this.wordDictionary = {};
         this.emojiDictionary = {};
+        this.colorDictionary = {};3
     }
 
     getEmojiDictionary() {
         return emotes;
     }
 
-    parse(user, msg) {
+    parse(user, msg, color) {
         msg_count++;
         var msg_arr = msg.split(" "); // split the message into array of string by whitespace
         var word_count = msg_arr.length; // get the count, this will be summed to the user's chattiness
         var caps_count = 0; //count of the number of CAPITALIZED words in the message, summed for user
         var emoji_count = 0; //count the number of emojis used, summed for user
+        var color_count = 0; //counts user's most common color 
+
         for (var i = 0; i < word_count; i++) {
             var word = msg_arr[i].trim();
 
@@ -45,6 +48,13 @@ class twitch_chat_reader {
               this.wordDictionary[wordHashFriendly]++;
             } else {
               this.wordDictionary[wordHashFriendly] = 1;
+            }
+
+            //Adding in colors into the dict
+            if(this.colorDictionary[color]){
+                this.colorDictionary[color]++;
+            } else {
+                this.colorDictionary[color] = 1;
             }
 
             // Start our emjoi dictionary
@@ -69,8 +79,9 @@ class twitch_chat_reader {
           word_count,
           caps_count,
           wordDictionary: this.wordDictionary,
-          emojiDictionary: this.emojiDictionary
+          emojiDictionary: this.emojiDictionary,
           //emoji_count - No Emoji Count until we get this working
+          colorDictionary: this.colorDictionary
         }
         return response;
     }
@@ -80,8 +91,9 @@ class twitch_chat_reader {
 
         this.client.on('chat', (channel, user, message) => {
             var user_string = user["username"];
-            var message_return = user_string + " " + message;
-            chatCallback(user_string, message_return, this.parse(user_string, message_return), context);
+            var user_color = user['color'];
+            var message_return =  message;
+            chatCallback(user_string, message_return, this.parse(user_string, message_return, user_color), context);
         });
     }
 };
