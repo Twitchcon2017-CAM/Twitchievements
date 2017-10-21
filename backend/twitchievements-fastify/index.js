@@ -296,7 +296,7 @@ fastify.post('/api/login', (request, reply) => {
             // Generate a JWT for the user
             const token = fastify.jwt.sign({
               email: request.body.email,
-              twitchUsername: request.body.twitchUsername
+              twitchUsername: user.twitchUsername
             });
 
             reply
@@ -314,7 +314,7 @@ fastify.post('/api/login', (request, reply) => {
                 // Generate a JWT for the user
                 const token = fastify.jwt.sign({
                   email: request.body.email,
-                  twitchUsername: request.body.twitchUsername
+                  twitchUsername: user.twitchUsername
                 });
 
                 reply
@@ -328,7 +328,7 @@ fastify.post('/api/login', (request, reply) => {
             // Generate a JWT for the user
             const token = fastify.jwt.sign({
               email: request.body.email,
-              twitchUsername: request.body.twitchUsername
+              twitchUsername: user.twitchUsername
             });
 
             reply
@@ -358,6 +358,8 @@ fastify.get('/api/stats', (request, reply) => {
       .code(401);
       return;
     }
+
+    console.log(tokenDecoded);
 
     // Get the stats for the user
     getStatsForUser(tokenDecoded.twitchUsername, reply);

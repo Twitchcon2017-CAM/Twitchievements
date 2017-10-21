@@ -70,7 +70,7 @@ export class ApiService {
     // TODO: grab a token
     return Observable.create(observer => {
       this.http.get(this.apiUrl + '/api/stats', {
-        headers: new HttpHeaders().set('token', 'TODO')
+        headers: new HttpHeaders().set('token', localStorage.getItem('token'))
       })
       .retry(1)
       .subscribe(res => {
@@ -83,8 +83,8 @@ export class ApiService {
     })
   }
 
+  // No Toekn Required for this route
   getStreamerStats(streamer: string) {
-    // TODO: grab a token
     return Observable.create(observer => {
       this.http.get(this.apiUrl + '/api/stats/' + streamer)
       .retry(1)
