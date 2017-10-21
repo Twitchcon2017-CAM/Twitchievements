@@ -14,7 +14,7 @@ export class JoinComponent implements OnInit {
   password: string
   confirmPassword: string
 
-  constructor(private apiService: ApiService, private router: Router) { }
+  constructor(public apiService: ApiService, private router: Router) { }
 
   ngOnInit() {
   }

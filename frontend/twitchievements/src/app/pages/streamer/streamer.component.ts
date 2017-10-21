@@ -15,7 +15,7 @@ export class StreamerComponent implements OnInit {
   streamerId: string
   error: any
 
-  constructor(private apiService: ApiService, private route: ActivatedRoute) {
+  constructor(public apiService: ApiService, private route: ActivatedRoute) {
     this.streamerId = this.route.snapshot.params['id']
     this.apiService.getStreamerStats(this.route.snapshot.params['id'])
     .subscribe(res => {

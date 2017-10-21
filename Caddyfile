@@ -1,3 +1,10 @@
 twitcheivements.aaronthedev.com {
+  root frontend/twitchievements/dist {
+    gzip
+  }
 
+  proxy /api localhost:8000 {
+    transparent
+    gzip
+  }
 }

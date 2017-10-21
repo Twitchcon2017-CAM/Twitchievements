@@ -16,7 +16,7 @@ export class DashboardComponent implements OnInit {
   emoteFetch: any
   error: any
 
-  constructor(private apiService: ApiService) {
+  constructor(public apiService: ApiService) {
 
     this.apiService.getStats()
     .subscribe(res => {
