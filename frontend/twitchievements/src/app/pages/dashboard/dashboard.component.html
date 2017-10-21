@@ -3,8 +3,38 @@
     Dashboard: {{username}}
   </h1>
 
+  <h1 class="dashboard__title center-text">
+    User Twitchviements
+  </h1>
+
   <div class="dashboard__twitchievement"
-    *ngFor="let twitchievement of twitchievementsKeys">
+    *ngFor="let twitchievement of userTwitchievementsKeys">
+    <ul class="dashboard__twitchievement__list">
+      <li>
+        <h1 class="dashboard__twitchievement__title center-text">
+          {{userTwitchievements[twitchievement].stream}}
+        </h1>
+        <h3 class="dashboard__twitchievement__description center-text">
+          Achieved: {{userTwitchievements[twitchievement].twitchievement.displayName}}
+        </h3>
+        <h5>
+          {{getDate(twitchievement)}}
+        </h5>
+      </li>
+    </ul>
+  </div>
+
+  <hr>
+
+  <h1 class="dashboard__title center-text">
+    Stream Twitchviements
+  </h1>
+
+  <div class="dashboard__twitchievement"
+    *ngFor="let twitchievement of twitchievementsKeys"
+    [hidden]="(!twitchievements[twitchievement].users ||
+    twitchievements[twitchievement].users.length < 3) && (!twitchievements[twitchievement].values ||
+    twitchievements[twitchievement].values.length < 3)">
     <h1 class="dashboard__twitchievement__title center-text">
       {{twitchievements[twitchievement].displayName}}
     </h1>

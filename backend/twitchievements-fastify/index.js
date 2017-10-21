@@ -261,53 +261,56 @@ function getStatsForUser(username, reply, returnAwards) {
           });
 
           // Pop the top 10 onto the twitchievement, and populate the user value for the twitchievement
-          userKeys.slice(0, 10).forEach((userKey, index) => {
+          const userKeySlice = userKeys.slice(0, 10)
+          userKeySlice.forEach((userKey, index) => {
             chatTwitchievements[twitchievement].users.push({
               username: userKey,
               value: streamer.users[userKey][twitchievement]
             });
+          });
 
-            // If first index, try to grant the award to a user if a twitchievement user
-            if (index == 0) {
-              collection.findOne({ twitchUsername: userKey }, (awardFindErr, awardUser) => {
-                if (awardFindErr) {
-                  // Just skip awards
-                  return;
-                }
-
-                if(awardUser) {
-                  // Look through the user's awards. Going to use dates as keys
-                  if(awardUser.awards) {
-                    Object.keys(awardUser.awards).forEach((awardKey) => {
-                      if(awardUser.awards[awardKey].stream === streamer.twitchUsername &&
-                      awardUser.awards[awardKey].twitchievement === twitchievement) {
-                        // They've already gotten this award
-                        return;
-                      }
-                    });
-                  } else {
-                    awardUser.awards = {};
-                  }
-
-                  // Give the user the award because it was not found Already
-                  const dateNow = new Date();
-                  awardUser.awards[dateNow.toString()] = {
-                    stream: streamer.twitchUsername,
-                    twitchievement: {
-                      twitchievementKey: twitchievement,
-                      displayName: twitchievementObject.displayName,
-                      description: twitchievementObject.description
-                    }
-                  }
-
-                  // Update the award user
-                  collection.updateOne({ twitchUsername: userKey }, {$set: {
-                    awards: awardUser.awards
-                  }});
-                }
-              });
+          // Try to add the award to the first user
+          collection.findOne({ twitchUsername: userKeySlice[0] }, (awardFindErr, awardUser) => {
+            if (awardFindErr) {
+              // Just skip awards
+              return;
             }
-          })
+
+            if(awardUser) {
+              userHasAward = false;
+              // Look through the user's awards. Going to use dates as keys
+              if(awardUser.awards) {
+                Object.keys(awardUser.awards).forEach((awardKey) => {
+                  if(awardUser.awards[awardKey].stream === streamer.twitchUsername &&
+                  awardUser.awards[awardKey].twitchievement &&
+                  awardUser.awards[awardKey].twitchievement.twitchievementKey === twitchievement) {
+                    // They've already gotten this award
+                    userHasAward = true;
+                  }
+                });
+              } else {
+                awardUser.awards = {};
+              }
+
+              if(!userHasAward) {
+                // Give the user the award because it was not found Already
+                const dateNow = new Date();
+                awardUser.awards[dateNow.toString()] = {
+                  stream: streamer.twitchUsername,
+                  twitchievement: {
+                    twitchievementKey: twitchievement,
+                    displayName: twitchievementObject.displayName,
+                    description: twitchievementObject.description
+                  }
+                }
+
+                // Update the award user
+                collection.updateOne({ twitchUsername: userKeySlice[0] }, {$set: {
+                  awards: awardUser.awards
+                }});
+              }
+            }
+          });
         }
       });
 
