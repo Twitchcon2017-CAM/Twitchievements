@@ -42,6 +42,12 @@ const twitchievementCategories = [
     description: 'A trending word appears! Measures the most frequent word amongst the communitty.',
     valueBased: true
   },
+  {
+    twitchievement: 'emojiDictionary',
+    displayName: 'Most Frequent Emoji',
+    description: 'An emoji is worth a thousand words. Most frequent emojis in the chat.',
+    valueBased: true
+  },
   // {
   //   twitchievement: 'emoji_count',
   //   displayName: 'Emojiest',
@@ -126,9 +132,19 @@ function chatReaderRunHandler(user, fullMessage, parseResult, context) {
       wordDictionary = Object.assign(wordDictionary, streamer.wordDictionary);
     }
 
+    // Get our emoji dictionary
+    let emojiDictionary = {};
+    if (parseResult.emojiDictionary) {
+      emojiDictionary = Object.assign(emojiDictionary, parseResult.emojiDictionary);
+    }
+    if (streamer.emojiDictionary) {
+      emojiDictionary = Object.assign(emojiDictionary, streamer.emojiDictionary);
+    }
+
     collection.updateOne({ email }, {$set: {
       users,
-      wordDictionary
+      wordDictionary,
+      emojiDictionary
     }});
   });
 }
@@ -182,8 +198,6 @@ function getStatsForUser(username, reply, returnAwards) {
         return;
       }
 
-      console.log(streamer)
-
       if (Object.keys(streamer.users).length < 5 &&
         (!streamer.awards ||
         Object.keys(streamer.awards).length <= 0)
@@ -208,23 +222,25 @@ function getStatsForUser(username, reply, returnAwards) {
           chatTwitchievements[twitchievement].values = [];
 
           // Find and sort the object on the streamer
-          const valueKeys = Object.keys(streamer[twitchievement]);
-          valueKeys.sort((a, b) => {
-            if(streamer[twitchievement][a] > streamer[twitchievement][b]) {
-              return -1;
-            }
-            if(streamer[twitchievement][a] < streamer[twitchievement][b]) {
-              return 1;
-            }
-            return 0;
-          });
-
-          valueKeys.slice(0, 10).forEach(valueKey => {
-            chatTwitchievements[twitchievement].values.push({
-              key: valueKey,
-              amount: streamer[twitchievement][valueKey]
+          if(streamer[twitchievement]) {
+            const valueKeys = Object.keys(streamer[twitchievement]);
+            valueKeys.sort((a, b) => {
+              if(streamer[twitchievement][a] > streamer[twitchievement][b]) {
+                return -1;
+              }
+              if(streamer[twitchievement][a] < streamer[twitchievement][b]) {
+                return 1;
+              }
+              return 0;
             });
-          });
+
+            valueKeys.slice(0, 10).forEach(valueKey => {
+              chatTwitchievements[twitchievement].values.push({
+                key: valueKey,
+                amount: streamer[twitchievement][valueKey]
+              });
+            });
+          }
         } else {
           // Handle User based Twitcheivements
           chatTwitchievements[twitchievement].users = [];
