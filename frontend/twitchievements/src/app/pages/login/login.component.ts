@@ -20,7 +20,8 @@ export class LoginComponent implements OnInit {
   login() {
     this.apiService.login(this.email, this.password)
     .subscribe(res => {
-      this.router.navigateByUrl('/#/dashboard')
+      localStorage.setItem('token', res.token);
+      this.router.navigateByUrl('/dashboard');
     }, err => {
       //
     });

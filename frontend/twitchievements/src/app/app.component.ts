@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { ApiService } from './services/api/api.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -13,15 +15,25 @@ export class AppComponent {
     },
     {
       title: 'Login',
-      url: '/#/login'
+      url: '/#/login',
+      hideOnAuth: true
     },
     {
       title: 'Join',
-      url: '/#/join'
+      url: '/#/join',
+      hideOnAuth: true
     },
     {
       title: 'Dashboard',
-      url: '/#/dashboard'
+      url: '/#/dashboard',
+      requiresAuth: true
     }
   ];
+
+  constructor(private apiService: ApiService, private router: Router) { }
+
+  logout() {
+    localStorage.removeItem('token');
+    this.router.navigateByUrl('');
+  }
 }
