@@ -22,6 +22,7 @@
     "fastify-jwt": "^0.1.0",
     "fastify-mongodb": "^0.1.0",
     "secure-password": "^2.1.1",
-    "tmi.js": "^1.2.1"
+    "tmi.js": "^1.2.1",
+    "twitch-api-v5": "^2.0.2"
   }
 }

@@ -1,5 +1,6 @@
 var tmi = require('tmi.js');
 var emotes = require('./emotes.json');
+var api = require('twitch-api-v5');
 var msg_count = 0; //the number of messages sent during the stream
 
 class twitch_chat_reader {
@@ -26,6 +27,35 @@ class twitch_chat_reader {
 
     getEmojiDictionary() {
         return emotes;
+    }
+
+    isChannelLive(channelName) {
+      return new Promise((resolve, reject) => {
+
+        api.streams.live({channel:""},function(err, res) {
+          if (err) console.log("Error" + err);
+          else {
+            var stream_list = res['streams'];
+            for(var i = 0; i < stream_list.length; i++){
+            var stream = stream_list[i];
+            var channel = stream['channel'];
+            var url = channel['url'];
+            url = url.replace("https://www.twitch.tv/", "");
+            //console.log(url+" "+channelName);
+            if(url === channelName)
+            resolve("hurrah");
+
+            }
+            reject("sad");
+          }
+        });
+      });
+    }
+
+    CheckOnlineStatus(name) {
+      client.on("unhost", function(channel, viewers){
+        console.log("JS shits")
+      });
     }
 
     parse(user, msg, color) {
