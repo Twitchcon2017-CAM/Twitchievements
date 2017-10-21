@@ -75,4 +75,19 @@ export class ApiService {
       });
     })
   }
+
+  getStreamerStats(streamer: string) {
+    // TODO: grab a token
+    return Observable.create(observer => {
+      this.http.get(this.apiUrl + '/stats/' + streamer)
+      .retry(1)
+      .subscribe(res => {
+        // handle Response
+        observer.next(res);
+      }, err => {
+        // TODO:
+        observer.error(err);
+      });
+    })
+  }
 }

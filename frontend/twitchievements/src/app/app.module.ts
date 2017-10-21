@@ -13,8 +13,13 @@ import { HomeComponent } from './pages/home/home.component';
 import { LoginComponent } from './pages/login/login.component';
 import { JoinComponent } from './pages/join/join.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { StreamerComponent } from './pages/streamer/streamer.component';
 
 const appRoutes: Routes = [
+  {
+    path: 'streamer/:id',
+    component: StreamerComponent
+  },
   {
     path: 'dashboard',
     component: DashboardComponent
@@ -28,7 +33,7 @@ const appRoutes: Routes = [
     component: LoginComponent
   },
   {
-    path: '',
+    path: '**',
     component: HomeComponent
   },
   //{ path: '**', component: PageNotFoundComponent }
@@ -40,7 +45,8 @@ const appRoutes: Routes = [
     HomeComponent,
     LoginComponent,
     JoinComponent,
-    DashboardComponent
+    DashboardComponent,
+    StreamerComponent
   ],
   imports: [
     BrowserModule,
