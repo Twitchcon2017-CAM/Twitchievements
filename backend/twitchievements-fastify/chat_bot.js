@@ -20,10 +20,10 @@ class twitch_chat_reader {
             channels: [channel]
         });
         this.wordDictionary = {};
+        this.emojiDictionary = {};
     }
 
     getEmojiDictionary() {
-        //TODO: dictionary of emojis
         return emotes;
     }
 
@@ -49,8 +49,15 @@ class twitch_chat_reader {
 
             // Start our emjoi dictionary
             var emojiDict = this.getEmojiDictionary();
-            if (emojiDict[word] != undefined) {
+            // Check if it is an emoji
+            if(emojiDict[word]) {
+              if (this.emojiDictionary[word] != undefined) {
+                  emoji_count++;
+                  this.emojiDictionary[word]++;
+              } else {
                 emoji_count++;
+                this.emojiDictionary[word] = 1;
+              }
             }
             if (word === word.toUpperCase()) {
                 //console.log(word+" "+word.toUpperCase());
@@ -62,6 +69,7 @@ class twitch_chat_reader {
           word_count,
           caps_count,
           wordDictionary: this.wordDictionary,
+          emojiDictionary: this.emojiDictionary
           //emoji_count - No Emoji Count until we get this working
         }
         return response;
