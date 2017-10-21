@@ -1,6 +1,9 @@
 // Require the framework and instantiate it
 const fastify = require('fastify')();
 
+// CORS
+fastify.use(require('cors')());
+
 // Get passwords
 const securePassword = require('secure-password');
 // Initialise our password policy
@@ -13,7 +16,7 @@ fastify.register(require('fastify-jwt'), { secret: 'supersecretfortwitchievement
 
 // Initialize mongo
 fastify.register(require('fastify-mongodb'), {
-  url: 'mongodb://localhost/twitcheivements'
+  url: 'mongodb://localhost/twitchievements'
 }, err => {
   if (err) throw err
 });
@@ -45,7 +48,7 @@ function getCollection(db, collectionKey, callback) {
 
 
 // Declare a route
-fastify.post('/signup', (request, reply) => {
+fastify.post('/api/join', (request, reply) => {
   const { db } = fastify.mongo;
 
   // Check for the Email existing
@@ -110,7 +113,7 @@ fastify.post('/signup', (request, reply) => {
   });
 });
 
-fastify.post('/login', (request, reply) => {
+fastify.post('/api/login', (request, reply) => {
   const { db } = fastify.mongo;
 
   // Check for the Email existing

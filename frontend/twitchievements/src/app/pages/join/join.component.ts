@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 export class JoinComponent implements OnInit {
 
   email: string
+  twitchUsername: string
   password: string
   confirmPassword: string
 
@@ -20,9 +21,9 @@ export class JoinComponent implements OnInit {
 
   join() {
     // TODO: Check for confirm password
-    this.apiService.join(this.email, this.password)
+    this.apiService.join(this.email, this.password, this.twitchUsername)
     .subscribe(res => {
-      this.router.navigateByUrl('/#/dashboard')
+      this.router.navigateByUrl('/dashboard')
     }, err => {
       //
     });

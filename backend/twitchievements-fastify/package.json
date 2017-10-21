@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Twitchcon2017-CAM/Twitchievements#readme",
   "dependencies": {
+    "cors": "^2.8.4",
     "fastify": "^0.30.2",
     "fastify-jwt": "^0.1.0",
     "fastify-mongodb": "^0.1.0",

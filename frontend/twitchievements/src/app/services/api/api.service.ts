@@ -25,13 +25,12 @@ export class ApiService {
     this.router.navigateByUrl('/#/')
   }
 
-  login(username, password) {
+  login(email, password) {
     return Observable.create(observer => {
-      this.http.post(this.apiUrl + '/login', {
-        username,
+      this.http.post(this.apiUrl + '/api/login', {
+        email,
         password
       })
-      .retry(1)
       .subscribe(res => {
         // handle Response
         observer.next(res);
@@ -42,13 +41,13 @@ export class ApiService {
     })
   }
 
-  join(username, password) {
+  join(email, password, twitchUsername) {
     return Observable.create(observer => {
-      this.http.post(this.apiUrl + '/join', {
-        username,
-        password
+      this.http.post(this.apiUrl + '/api/join', {
+        email,
+        password,
+        twitchUsername
       })
-      .retry(1)
       .subscribe(res => {
         // handle Response
         observer.next(res);
@@ -62,7 +61,7 @@ export class ApiService {
   getStats() {
     // TODO: grab a token
     return Observable.create(observer => {
-      this.http.get(this.apiUrl + '/join', {
+      this.http.get(this.apiUrl + '/api/stats', {
         headers: new HttpHeaders().set('token', 'TODO')
       })
       .retry(1)
@@ -79,7 +78,7 @@ export class ApiService {
   getStreamerStats(streamer: string) {
     // TODO: grab a token
     return Observable.create(observer => {
-      this.http.get(this.apiUrl + '/stats/' + streamer)
+      this.http.get(this.apiUrl + '/api/stats/' + streamer)
       .retry(1)
       .subscribe(res => {
         // handle Response
