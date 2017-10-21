@@ -6,5 +6,14 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.sass']
 })
 export class AppComponent {
-  title = 'app';
+  navRoutes = [
+    {
+      title: 'Home',
+      url: '/#/'
+    },
+    {
+      title: 'Login',
+      url: '/#/login'
+    }
+  ];
 }

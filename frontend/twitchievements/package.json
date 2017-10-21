@@ -23,6 +23,10 @@
     "@angular/router": "^4.2.4",
     "core-js": "^2.4.1",
     "rxjs": "^5.4.2",
+    "sass-bem-mixins": "^1.1.6",
+    "sass-loading-spinner": "^1.0.4",
+    "sass-media-queries": "^1.0.3",
+    "sass-theme-defaults": "^1.0.2",
     "zone.js": "^0.8.14"
   },
   "devDependencies": {
