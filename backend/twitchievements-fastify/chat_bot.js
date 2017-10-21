@@ -1,4 +1,5 @@
 var tmi = require('tmi.js');
+var emotes = require('./emotes.json');
 var msg_count = 0; //the number of messages sent during the stream
 
 class twitch_chat_reader {
@@ -23,7 +24,7 @@ class twitch_chat_reader {
 
     getEmojiDictionary() {
         //TODO: dictionary of emojis
-        return { "happyface": 0 };
+        return emotes;
     }
 
     parse(user, msg) {
@@ -33,7 +34,7 @@ class twitch_chat_reader {
         var caps_count = 0; //count of the number of CAPITALIZED words in the message, summed for user
         var emoji_count = 0; //count the number of emojis used, summed for user
         for (var i = 0; i < word_count; i++) {
-            var word = msg_arr[i];
+            var word = msg_arr[i].trim();
 
             // Add the word to our word dicitonary
             // Be sure to remove dots to avoid dot notation in bracket notation
