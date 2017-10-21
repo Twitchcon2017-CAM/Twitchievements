@@ -34,5 +34,28 @@
         }
       }
     }
+
+    @include element('user-list') {
+
+      @include element('item') {
+        display: flex;
+        margin-top: 10px;
+        margin-bottom: 10px;;
+
+        @include element('date') {
+
+        }
+
+        @include element('stream') {
+          margin-left: auto;
+        }
+
+        @include element('title') {
+          margin-left: 10px;
+          margin-right: 10px;
+          font-weight: bold;
+        }
+      }
+    }
   }
 }

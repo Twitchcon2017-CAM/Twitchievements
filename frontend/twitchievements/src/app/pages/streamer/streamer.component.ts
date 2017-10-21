@@ -28,6 +28,11 @@ export class StreamerComponent implements OnInit {
   }
 
   ngOnInit() {
+    new (<any>window).Twitch.Embed("twitch-embed", {
+        width: 854,
+        height: 480,
+        channel: this.route.snapshot.params['id']
+    });
   }
 
 }

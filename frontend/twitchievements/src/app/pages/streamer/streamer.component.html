@@ -3,6 +3,12 @@
     <a href="https://twitch.tv/{{streamerId}}" target="_blank">{{streamerId}}</a>
   </h1>
 
+  <!-- Twitch Embed -->
+  <!-- Add a placeholder for the Twitch embed -->
+  <div class="streamer__embed center-text">
+    <div id="twitch-embed"></div>
+  </div>
+
   <div class="streamer__twitchievement"
     *ngFor="let twitchievement of twitchievementsKeys"
     [hidden]="(!twitchievements[twitchievement].users ||

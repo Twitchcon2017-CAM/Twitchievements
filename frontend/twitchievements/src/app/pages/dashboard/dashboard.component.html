@@ -9,17 +9,17 @@
 
   <div class="dashboard__twitchievement"
     *ngFor="let twitchievement of userTwitchievementsKeys">
-    <ul class="dashboard__twitchievement__list">
-      <li>
-        <h1 class="dashboard__twitchievement__title center-text">
-          {{userTwitchievements[twitchievement].stream}}
+    <ul class="dashboard__twitchievement__user-list">
+      <li class="dashboard__twitchievement__user-list__item">
+        <h1 class="dashboard__twitchievement__user-list__item__date">
+          {{getDate(twitchievement)}}
         </h1>
-        <h3 class="dashboard__twitchievement__description center-text">
+        <h3 class="dashboard__twitchievement__user-list__item__stream">
+          {{userTwitchievements[twitchievement].stream}}
+        </h3>
+        <h3 class="dashboard__twitchievement__user-list__item__title">
           Achieved: {{userTwitchievements[twitchievement].twitchievement.displayName}}
         </h3>
-        <h5>
-          {{getDate(twitchievement)}}
-        </h5>
       </li>
     </ul>
   </div>

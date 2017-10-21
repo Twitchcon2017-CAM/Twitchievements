@@ -7,6 +7,13 @@
     margin-top: 10px;
   }
 
+  @include element('embed') {
+    max-width: 90%;
+    @include smq__mobile() {
+      display: none;
+    }
+  }
+
   @include element('twitchievement') {
 
     @include element('title') {
