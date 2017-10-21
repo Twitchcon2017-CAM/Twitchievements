@@ -12,7 +12,7 @@ var options = {
     },
     identity: {
         username: "lenny_face_bot",
-        password: 'oauth:lfdh5h0dzjvg4vyfdin2hb1web1ky7'
+        password: ''
     },
     channels: ["cmonte905"]
 };
@@ -24,13 +24,13 @@ client.connect();
 client.on('chat', function(channel, user, message, self) {
     var user_string = user["username"];
     var message_return = user_string + " " + message + "\n";
-    parse(user, msg)
+    parse(user_string, message_return)
     fs.appendFileSync('message.txt', message_return);
 });
 
 function getWordDictionary(){
   //TODO: get the dictionary of word usage which should be contained in the stream log level of the JSON
-  return {"twitch":0, "bloody":0, "con":0};
+  return {"twitch":0, "bloody":0, "co":0};
 }
 
 function getEmojiDictionary(){
@@ -39,28 +39,33 @@ function getEmojiDictionary(){
 }
 
 function parse(user, msg){
+    //console.log(msg);
     msg_count++;
     var msg_arr = msg.split(" "); //split the message into array of string by whitespace
     word_count = msg_arr.length; //get the count, this will be summed to the user's chattiness
     caps_count = 0;              //count of the number of CAPITALIZED words in the message, summed for user
     emoji_count = 0;             //count the number of emojis used, summed for user
-    for(word in msg_arr){
+    for(var i = 0; i < word_count; i++){
+      var word = msg_arr[i];
+    //for(word in msg_arr){
       var dict = getWordDictionary(); //access word frequency dict for this session or streamer? unclear at this point
       var emojiDict = getEmojiDictionary();
       if(emojiDict[word] != undefined){
         emoji_count++;
       }
       if(dict[word] != undefined){
+        //console.log(word);
         dict[word]++;
       }
       else {
         dict[word] = 1;
       }
-      if(word === word.toUppercase()){
+      if(word === word.toUpperCase()){
+        //console.log(word+" "+word.toUpperCase());
         caps_count++;
       }
     }
-    Console.log(msg_count+" "+word_count+" "+caps_count+" "+emojiDict);
+    //console.log(msg_count+" "+word_count+" "+caps_count+" "+emoji_count);
 
 
 }
